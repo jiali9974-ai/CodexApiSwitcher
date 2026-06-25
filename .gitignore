@@ -1,0 +1,36 @@
+# Local Codex/runtime data
+work/*/
+work/protected-before.json
+work/codex-api-switcher.ps1
+work/test-codex-api-switcher.ps1
+outputs/codex-api-switcher.ps1
+
+# Generated switcher data and backups
+api-switcher/
+config-switcher-backups/
+history_sync_backups/
+sessions/
+archived_sessions/
+state_5.sqlite*
+memories*
+session_index.jsonl
+auth.json
+
+# Build/test scratch
+*.tmp
+*.bak
+*.log
+
+!.gitignore
+!README.md
+!docs/
+!docs/code-map.md
+!work/
+!work/CodexApiSwitcher.cs
+!work/build-codex-api-switcher.ps1
+!work/test-codex-api-switcher-exe.ps1
+!work/check-sidebar-fixture.py
+!outputs/
+!outputs/CodexApiSwitcher.exe
+!outputs/cas-logo.ico
+!outputs/使用说明.txt

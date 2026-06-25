@@ -1,0 +1,42 @@
+Codex API 切换器
+================
+
+文件：
+CodexApiSwitcher.exe
+
+使用方法：
+1. 双击 CodexApiSwitcher.exe。
+2. 选择包含 config.toml 的 Codex 根目录。
+   如果你设置了 CODEX_HOME，会优先使用该目录；否则选择自己的 Codex 根目录。
+3. 第三方模式：
+   - 填写 Base URL，例如 https://api.example.com
+     工具会自动规范为 https://api.example.com/v1
+   - 填写第三方模型名称
+   - 首次填写 API Key
+   - 点击“切换到第三方 API”
+4. 官方模式：
+   - 填写官方模型名称
+   - 点击“切换到官方登录”
+5. 切换前请彻底退出 Codex。切换完成后重新打开 Codex。
+6. 如果误删 model_provider、model 或损坏第三方 provider 配置：
+   - 点击“一键恢复基础配置”
+   - 工具会备份当前 config.toml
+   - 恢复为官方 OpenAI 登录配置
+   - MCP、插件、沙箱及其他无关配置保持不变
+
+安全说明：
+- 程序为单 EXE，不需要安装 Python、SQLite 或其他运行库。
+- SQLite 操作使用 Windows 10/11 自带的 winsqlite3.dll。
+- API Key 使用 Windows DPAPI 加密，只能由当前 Windows 用户解密。
+- 每次切换前都会备份 config.toml，以及检测到的新旧状态数据库。
+- 每次切换都会同步根目录旧库、sqlite 子目录活动库和会话 JSONL 第一行的 model_provider，
+  防止 Codex 重启后把历史重新分回不同模式。
+- 修改会话 JSONL 前会在 history_sync_backups 中逐文件备份。
+- 工具只修改顶层用户会话的 provider 元数据和侧栏可见标记。
+- 工具不修改会话正文、memories、
+  memories_1.sqlite、session_index.jsonl 或 auth.json。
+- 官方模式继续使用 Codex 已有的 OpenAI 登录状态。
+- “恢复最近备份”可以回退最后一次配置修改。
+- “一键恢复基础配置”只重建 model/model_provider，并清理损坏的 custom provider 段。
+- 如果侧栏显示“暂无对话”，请先彻底退出 Codex，再点击“修复会话列表”。
+  该操作会先自动识别并备份新旧状态数据库，然后只恢复顶层用户会话的可见标记。
