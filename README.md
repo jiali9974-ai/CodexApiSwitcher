@@ -10,7 +10,9 @@ Codex API Switcher（CAS）用来在 Codex 的官方 OpenAI 登录和第三方 O
 - macOS Intel：[CodexApiSwitcher-macos-x64.zip](https://github.com/jiali9974-ai/CodexApiSwitcher/releases/download/v2.1.0/CodexApiSwitcher-macos-x64.zip)
 - Release 页面：[v2.1.0](https://github.com/jiali9974-ai/CodexApiSwitcher/releases/tag/v2.1.0)
 
-Windows 和 Linux 版本可以从源码构建，或使用本地构建产物发布到 Releases。
+- Windows：[CodexApiSwitcher-win-x64.exe](https://github.com/jiali9974-ai/CodexApiSwitcher/releases/download/v2.1.0/CodexApiSwitcher-win-x64.exe)
+
+Linux 版本可以从源码构建，或使用本地构建产物发布到 Releases。
 
 ## macOS 怎么打开
 
@@ -46,9 +48,10 @@ xattr -dr com.apple.quarantine ./CodexApiSwitcher-macos-x64.app
 
 ## Windows 怎么打开
 
-1. 双击 `CodexApiSwitcher-win-x64.exe`。
-2. 选择包含 `config.toml` 的 Codex 根目录。
-3. 如果 Windows 安全提示，请确认来源是你的仓库发布包后再允许运行。
+1. 从 Release 下载 [CodexApiSwitcher-win-x64.exe](https://github.com/jiali9974-ai/CodexApiSwitcher/releases/download/v2.1.0/CodexApiSwitcher-win-x64.exe)。
+2. 双击 `CodexApiSwitcher-win-x64.exe`。
+3. 选择包含 `config.toml` 的 Codex 根目录。
+4. 如果 Windows 安全提示，请确认来源是你的仓库发布包后再允许运行。
 
 ## Linux 怎么打开
 
@@ -228,7 +231,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File work\test-cross-platform.ps1
 
 ### 为什么 Git 仓库里没有直接放 .app？
 
-macOS `.app` 内部的自包含主程序超过 GitHub 普通 Git 单文件 100 MB 限制，所以不放进 Git 历史。请从 GitHub Releases 下载 zip，zip 解压后就是 `.app`。
+macOS `.app` 内部的自包含主程序、Windows 自包含 exe 都接近或超过 GitHub 普通 Git 单文件 100 MB 限制，所以不放进 Git 历史。请从 GitHub Releases 下载发布包。macOS zip 解压后就是 `.app`，Windows 直接下载 exe。
 
 ### 为什么 macOS 首次运行要手动允许？
 
