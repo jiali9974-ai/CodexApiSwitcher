@@ -121,7 +121,9 @@ internal sealed partial class MainWindow : Window
     internal void HideToTray(bool showNotice = true)
     {
         Hide();
-        if (showNotice) SetStatus("CAS 仍在后台运行；点击托盘图标或使用快捷键可重新打开。", Muted, White);
+        if (showNotice) SetStatus(OperatingSystem.IsMacOS()
+            ? "CAS 仍在后台运行；可通过菜单栏图标、Dock 图标或再次双击 App 打开。"
+            : "CAS 仍在后台运行；点击托盘图标或使用快捷键可重新打开。", Muted, White);
     }
 
     internal async Task LaunchCodexFromTrayAsync() => await RunActionAsync(launchCodexButton, "正在启动 Codex", async service =>
@@ -181,6 +183,12 @@ internal sealed partial class MainWindow : Window
         {
             if (!AllowExit && !snapshotMode)
             {
+                if (OperatingSystem.IsMacOS())
+                {
+                    AllowExit = true;
+                    App.CurrentApp?.Exit();
+                    return;
+                }
                 args.Cancel = true;
                 HideToTray();
             }
@@ -188,7 +196,7 @@ internal sealed partial class MainWindow : Window
         Closed += (_, _) => globalInput?.Dispose();
         PropertyChanged += (_, args) =>
         {
-            if (args.Property == WindowStateProperty && WindowState == WindowState.Minimized && !snapshotMode) HideToTray();
+            if (args.Property == WindowStateProperty && WindowState == WindowState.Minimized && !snapshotMode && !OperatingSystem.IsMacOS()) HideToTray();
         };
     }
 
@@ -196,7 +204,7 @@ internal sealed partial class MainWindow : Window
     {
         footerText.Text = CodexPlatform.Description switch
         {
-            "macOS" => "切换完成后请重新打开 Codex。首次使用全局快捷键时，macOS 可能要求授予“辅助功能”权限。开机启动会驻留菜单栏。",
+            "macOS" => "切换完成后请重新打开 Codex。红色关闭按钮会退出 CAS；最小化会留在 Dock。首次使用全局快捷键时，macOS 可能要求授予“辅助功能”权限。",
             "Linux" => "切换完成后请重新打开 Codex。全局快捷键需要 X11；Wayland 会保留设置但可能无法监听。开机启动使用 XDG Autostart。",
             _ => "切换完成后请重新打开 Codex。快捷键和鼠标侧键都支持打开/收回后台。开机启动会直接驻留托盘。"
         };
