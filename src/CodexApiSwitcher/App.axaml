@@ -1,0 +1,90 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="CodexApiSwitcher.App"
+             RequestedThemeVariant="Light">
+  <Application.Styles>
+    <FluentTheme />
+    <Style Selector="Window">
+      <Setter Property="FontFamily" Value="Inter, Microsoft YaHei UI, PingFang SC, Noto Sans CJK SC, sans-serif" />
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="Foreground" Value="#172033" />
+      <Setter Property="Background" Value="#F7F9FC" />
+    </Style>
+    <Style Selector="TextBlock.label">
+      <Setter Property="Foreground" Value="#172033" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="TextBox">
+      <Setter Property="Background" Value="White" />
+      <Setter Property="BorderBrush" Value="#CAD5E2" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="0" />
+      <Setter Property="Padding" Value="6,3" />
+    </Style>
+    <Style Selector="TextBox:focus">
+      <Setter Property="Background" Value="#F0F6FF" />
+      <Setter Property="BorderBrush" Value="#2457D6" />
+    </Style>
+    <Style Selector="ComboBox">
+      <Setter Property="Background" Value="White" />
+      <Setter Property="BorderBrush" Value="#CAD5E2" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="0" />
+      <Setter Property="Padding" Value="6,2" />
+    </Style>
+    <Style Selector="Button">
+      <Setter Property="Background" Value="White" />
+      <Setter Property="Foreground" Value="#172033" />
+      <Setter Property="BorderBrush" Value="#CAD5E2" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="0" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Cursor" Value="Hand" />
+      <Setter Property="Transitions">
+        <Transitions>
+          <BrushTransition Property="Background" Duration="0:0:0.16" />
+          <BrushTransition Property="BorderBrush" Duration="0:0:0.16" />
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Button:pointerover">
+      <Setter Property="Background" Value="#F8FAFC" />
+      <Setter Property="BorderBrush" Value="#A9B9CC" />
+    </Style>
+    <Style Selector="Button:pressed">
+      <Setter Property="Background" Value="#EBF1F8" />
+    </Style>
+    <Style Selector="Button:disabled">
+      <Setter Property="Background" Value="#E5EAF2" />
+      <Setter Property="Foreground" Value="#8E97A5" />
+      <Setter Property="BorderBrush" Value="#D5DCE8" />
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="Button.primaryBlue">
+      <Setter Property="Background" Value="#2457D6" />
+      <Setter Property="Foreground" Value="White" />
+      <Setter Property="BorderBrush" Value="#2457D6" />
+    </Style>
+    <Style Selector="Button.primaryBlue:pointerover"><Setter Property="Background" Value="#1E48B3" /></Style>
+    <Style Selector="Button.primaryBlue:pressed"><Setter Property="Background" Value="#183A91" /></Style>
+    <Style Selector="Button.primaryDark">
+      <Setter Property="Background" Value="#172033" />
+      <Setter Property="Foreground" Value="White" />
+      <Setter Property="BorderBrush" Value="#172033" />
+    </Style>
+    <Style Selector="Button.primaryDark:pointerover"><Setter Property="Background" Value="#233046" /></Style>
+    <Style Selector="Button.primaryDark:pressed"><Setter Property="Background" Value="#0D1726" /></Style>
+    <Style Selector="Button.teal">
+      <Setter Property="Background" Value="#17A6A6" />
+      <Setter Property="Foreground" Value="White" />
+      <Setter Property="BorderBrush" Value="#17A6A6" />
+    </Style>
+    <Style Selector="Button.teal:pointerover"><Setter Property="Background" Value="#138888" /></Style>
+    <Style Selector="Button.danger">
+      <Setter Property="Background" Value="#B42318" />
+      <Setter Property="Foreground" Value="White" />
+      <Setter Property="BorderBrush" Value="#B42318" />
+    </Style>
+    <Style Selector="Button.danger:pointerover"><Setter Property="Background" Value="#961C14" /></Style>
+  </Application.Styles>
+</Application>

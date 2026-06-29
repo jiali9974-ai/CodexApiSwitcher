@@ -1,0 +1,86 @@
+Codex API Switcher 跨平台版使用说明
+===================================
+
+最外层文件
+----------
+
+Windows：
+- CodexApiSwitcher-win-x64.exe
+
+macOS：
+- CodexApiSwitcher-macos-arm64.zip  （推荐，Apple Silicon / M 系列）
+- CodexApiSwitcher-macos-x64.zip    （推荐，Intel）
+- CodexApiSwitcher-macos-arm64.app  （Apple Silicon / M 系列）
+- CodexApiSwitcher-macos-x64.app    （Intel）
+
+Linux：
+- CodexApiSwitcher-linux-x64
+- CodexApiSwitcher-linux-arm64
+
+兼容版：
+- outputs\CodexApiSwitcher.exe 是原 Windows WinForms 版。
+
+
+怎么运行
+--------
+
+Windows：
+1. 双击 CodexApiSwitcher-win-x64.exe。
+2. 选择包含 config.toml 的 Codex 根目录。
+
+macOS：
+1. 推荐下载/复制对应架构的 zip，在 macOS 上解压后双击里面的 .app。
+2. 不建议直接从 Windows 文件夹复制裸 .app 到 macOS；裸文件夹容易丢失 Contents/MacOS 入口的 Unix 可执行位，Finder 会弹“无法打开”。
+   本仓库当前生成的 zip 会保留可执行位，解压后的 .app 使用原生 macOS Mach-O 入口。
+3. 如果系统提示来自未验证开发者，可在“系统设置 -> 隐私与安全性”里允许打开。
+4. 如果全局快捷键或鼠标侧键没有反应，请在“系统设置 -> 隐私与安全性 -> 辅助功能”里给本 app 授权。
+5. 如果双击仍失败，可在终端 Terminal 里查看日志：
+   tail -n 80 ~/Library/Logs/CodexApiSwitcher.log
+6. 如需在终端 Terminal 里放行隔离属性，可执行：
+   xattr -dr com.apple.quarantine ./CodexApiSwitcher-macos-arm64.app
+   或：
+   xattr -dr com.apple.quarantine ./CodexApiSwitcher-macos-x64.app
+7. 当前发布包使用本机 ad-hoc 签名，不是 Apple Developer ID 公证包；首次下载运行仍可能需要在“隐私与安全性”里确认。
+
+Linux：
+1. 先给文件加执行权限：
+   chmod +x ./CodexApiSwitcher-linux-x64
+   或：
+   chmod +x ./CodexApiSwitcher-linux-arm64
+2. 运行：
+   ./CodexApiSwitcher-linux-x64
+   或：
+   ./CodexApiSwitcher-linux-arm64
+3. Linux 桌面需要基础系统库，例如 glibc、libstdc++、ICU、fontconfig、X11/AppIndicator 相关库。
+4. 全局快捷键/鼠标侧键以 X11 支持最好；Wayland 下取决于桌面环境权限策略。
+
+
+使用步骤
+--------
+
+1. 选择 Codex 根目录，也就是包含 config.toml 的目录。
+   如果你设置了 CODEX_HOME，工具会优先使用该目录；否则通常是用户目录下的 .codex。
+   Windows、macOS、Linux 都只允许当前用户后台运行一个 CAS；如果已经在托盘/菜单栏后台运行，再双击图标会打开已有窗口，不会再启动一个后台进程。
+2. 切换到第三方 API：
+   - 填写 Base URL，例如 https://api.example.com
+   - 工具会自动规范为 https://api.example.com/v1
+   - 填写第三方模型名称
+   - 首次填写 API Key
+   - 点击“切换到第三方 API”
+3. 切换回官方登录：
+   - 填写官方模型名称
+   - 点击“切换到官方登录”
+4. 每次切换前请彻底退出 Codex；切换完成后重新打开 Codex。
+
+
+安全说明
+--------
+
+- 跨平台版为自包含程序，不需要安装 Python、.NET 或 SQLite。
+- API Key 使用系统安全存储：
+  - Windows：DPAPI
+  - macOS：Keychain
+  - Linux：Secret Service；如果没有密钥环，则使用当前用户 0600 权限的本地加密保险库
+- 工具会自动备份 config.toml、检测到的新旧 state_5.sqlite 和被改动的会话元数据。
+- 工具不会修改会话正文、memories、session_index.jsonl 或 auth.json。
+- 如果侧栏显示“暂无对话”，请先彻底退出 Codex，再点击“修复会话列表”。

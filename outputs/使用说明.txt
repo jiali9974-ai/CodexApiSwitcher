@@ -2,10 +2,18 @@ Codex API 切换器
 ================
 
 文件：
-CodexApiSwitcher.exe
+跨平台版：
+outputs\cross-platform\win-x64\CodexApiSwitcher.exe
+outputs\cross-platform\osx-arm64\Codex API Switcher.app
+outputs\cross-platform\osx-x64\Codex API Switcher.app
+outputs\cross-platform\linux-x64\CodexApiSwitcher
+outputs\cross-platform\linux-arm64\CodexApiSwitcher
+
+兼容版：
+outputs\CodexApiSwitcher.exe（原 Windows WinForms 版）
 
 使用方法：
-1. 双击 CodexApiSwitcher.exe。
+1. Windows 双击 win-x64 目录下的 CodexApiSwitcher.exe；macOS 打开对应架构的 .app；Linux 给 CodexApiSwitcher 加执行权限后运行。
 2. 选择包含 config.toml 的 Codex 根目录。
    如果你设置了 CODEX_HOME，会优先使用该目录；否则选择自己的 Codex 根目录。
 3. 第三方模式：
@@ -18,6 +26,7 @@ CodexApiSwitcher.exe
    - 填写官方模型名称
    - 点击“切换到官方登录”
 5. 切换前请彻底退出 Codex。切换完成后重新打开 Codex。
+6. 跨平台版启用单实例保护；如果 CAS 已在托盘/菜单栏后台运行，再双击图标会打开已有窗口，不会多开后台进程。
 6. 如果误删 model_provider、model 或损坏第三方 provider 配置：
    - 点击“一键恢复基础配置”
    - 工具会备份当前 config.toml
@@ -25,9 +34,12 @@ CodexApiSwitcher.exe
    - MCP、插件、沙箱及其他无关配置保持不变
 
 安全说明：
-- 程序为单 EXE，不需要安装 Python、SQLite 或其他运行库。
-- SQLite 操作使用 Windows 10/11 自带的 winsqlite3.dll。
-- API Key 使用 Windows DPAPI 加密，只能由当前 Windows 用户解密。
+- 跨平台版为自包含单文件，不需要安装 Python、.NET 或 SQLite。
+- SQLite 使用随应用打包的跨平台运行库。
+- API Key 使用系统安全存储：Windows DPAPI、macOS Keychain、Linux Secret Service；
+  Linux 无密钥环时使用当前用户 0600 权限的本地加密保险库。
+- Linux 桌面仍需系统基础库，例如 glibc、libstdc++、ICU、fontconfig、X11/AppIndicator 相关库。
+- macOS 首次使用全局快捷键/鼠标侧键可能需要在“系统设置 -> 隐私与安全性 -> 辅助功能”中授权。
 - 每次切换前都会备份 config.toml，以及检测到的新旧状态数据库。
 - 每次切换都会同步根目录旧库、sqlite 子目录活动库和会话 JSONL 第一行的 model_provider，
   防止 Codex 重启后把历史重新分回不同模式。
