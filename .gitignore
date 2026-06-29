@@ -17,12 +17,23 @@ session_index.jsonl
 auth.json
 
 # Build/test scratch
+.DS_Store
 *.tmp
 *.bak
 *.log
+src/**/bin/
+src/**/obj/
+outputs/cross-platform/
+.dotnet/
+.dotnet-home/
+.nuget/
+work/baseline-win.png
+work/cross-ui-*.png
+CodexApiSwitcher-*
 
 !.gitignore
 !README.md
+!使用说明-跨平台.txt
 !docs/
 !docs/code-map.md
 !work/
@@ -33,4 +44,5 @@ auth.json
 !outputs/
 !outputs/CodexApiSwitcher.exe
 !outputs/cas-logo.ico
+!outputs/cas-logo.icns
 !outputs/使用说明.txt

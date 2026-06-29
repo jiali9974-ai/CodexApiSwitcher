@@ -1,0 +1,83 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="CodexApiSwitcher.Views.MainWindow"
+        x:Name="MainWindowRoot"
+        Title="CAS - Codex API 切换器"
+        Width="690" Height="755"
+        MinWidth="690" MinHeight="755"
+        WindowStartupLocation="CenterScreen"
+        Icon="/Assets/cas-logo.ico"
+        Background="#F7F9FC">
+  <Canvas Width="690" Height="755" Background="#F7F9FC">
+    <TextBlock Canvas.Left="28" Canvas.Top="20" Text="CAS · Codex API 切换器"
+               FontSize="24" FontWeight="Bold" />
+
+    <Border Canvas.Left="30" Canvas.Top="64" Width="630" Height="38"
+            Background="#ECFDF3" BorderBrush="#86B995" BorderThickness="1">
+      <TextBlock Margin="8,0" VerticalAlignment="Center" Foreground="#15803D"
+                 Text="切换前请先彻底退出 Codex。工具会自动备份配置和历史库，不会修改会话正文、记忆文件或 auth.json。" />
+    </Border>
+
+    <TextBlock Classes="label" Canvas.Left="30" Canvas.Top="117" Width="125" Height="27" Text="Codex 根目录" />
+    <TextBox x:Name="RootBox" Canvas.Left="160" Canvas.Top="117" Width="405" Height="27"
+             AutomationProperties.Name="Codex 根目录" ToolTip.Tip="选择包含 config.toml 的 Codex 根目录。" />
+    <Button x:Name="BrowseButton" Canvas.Left="575" Canvas.Top="116" Width="85" Height="30" Content="选择..."
+            AutomationProperties.Name="选择 Codex 根目录" />
+
+    <Border x:Name="StatusBorder" Canvas.Left="30" Canvas.Top="158" Width="630" Height="38"
+            Background="White" BorderBrush="#CAD5E2" BorderThickness="1">
+      <TextBlock x:Name="StatusText" Margin="8,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+    </Border>
+
+    <TextBlock Classes="label" Canvas.Left="30" Canvas.Top="205" Width="125" Height="27" Text="中转站档案" />
+    <ComboBox x:Name="ProfileBox" Canvas.Left="160" Canvas.Top="205" Width="270" Height="27"
+              AutomationProperties.Name="中转站档案" />
+    <Button x:Name="SaveProfileButton" Canvas.Left="445" Canvas.Top="202" Width="95" Height="32" Content="保存档案" />
+    <Button x:Name="DeleteProfileButton" Canvas.Left="555" Canvas.Top="202" Width="105" Height="32" Content="删除档案" />
+
+    <TextBlock Classes="label" Canvas.Left="30" Canvas.Top="245" Width="125" Height="27" Text="第三方 Base URL" />
+    <TextBox x:Name="UrlBox" Canvas.Left="160" Canvas.Top="245" Width="500" Height="27"
+             AutomationProperties.Name="第三方 Base URL" ToolTip.Tip="第三方 API 地址，工具会自动规范为 /v1。" />
+
+    <TextBlock Classes="label" Canvas.Left="30" Canvas.Top="285" Width="125" Height="27" Text="第三方模型" />
+    <TextBox x:Name="ThirdPartyModelBox" Canvas.Left="160" Canvas.Top="285" Width="210" Height="27" AutomationProperties.Name="第三方模型" />
+    <TextBlock Classes="label" Canvas.Left="390" Canvas.Top="285" Width="75" Height="27" Text="官方模型" />
+    <TextBox x:Name="OfficialModelBox" Canvas.Left="475" Canvas.Top="285" Width="185" Height="27" AutomationProperties.Name="官方模型" />
+
+    <TextBlock Classes="label" Canvas.Left="30" Canvas.Top="325" Width="125" Height="27" Text="第三方 API Key" />
+    <TextBox x:Name="KeyBox" Canvas.Left="160" Canvas.Top="325" Width="410" Height="27" PasswordChar="●"
+             AutomationProperties.Name="第三方 API Key" ToolTip.Tip="API Key 只会加密保存在当前用户的系统凭据存储中。" />
+    <CheckBox x:Name="ShowKeyCheckBox" Canvas.Left="580" Canvas.Top="327" Width="70" Height="24" Content="显示" />
+    <TextBlock x:Name="KeyStateText" Canvas.Left="160" Canvas.Top="356" Width="500" Height="20" Foreground="#586376" />
+
+    <CheckBox x:Name="CompatibilityCheckBox" Canvas.Left="30" Canvas.Top="378" Width="95" Height="24" Content="兼容模式" />
+    <TextBlock Canvas.Left="130" Canvas.Top="374" Width="530" Height="34" Foreground="#586376" TextWrapping="Wrap"
+               Text="遇到 Image generation 403 时开启；切第三方会收起高级工具，切回官方自动恢复。" />
+
+    <Button x:Name="ThirdPartyButton" Classes="primaryBlue" Canvas.Left="30" Canvas.Top="418" Width="195" Height="46" Content="切换到第三方 API" />
+    <Button x:Name="OfficialButton" Classes="primaryDark" Canvas.Left="245" Canvas.Top="418" Width="195" Height="46" Content="切换到官方登录" />
+    <Button x:Name="RollbackButton" Canvas.Left="460" Canvas.Top="418" Width="200" Height="46" Content="恢复最近备份" />
+
+    <Button x:Name="RepairButton" Canvas.Left="30" Canvas.Top="484" Width="145" Height="42" Content="修复会话列表" />
+    <Button x:Name="ResetConfigButton" Canvas.Left="190" Canvas.Top="484" Width="145" Height="42" Content="恢复基础配置" />
+    <Button x:Name="LaunchCodexButton" Classes="teal" Canvas.Left="350" Canvas.Top="484" Width="145" Height="42" Content="启动 Codex" />
+    <Button x:Name="CloseCodexButton" Classes="danger" Canvas.Left="510" Canvas.Top="484" Width="150" Height="42" Content="关闭 Codex 后台" />
+    <TextBlock Canvas.Left="30" Canvas.Top="538" Width="630" Height="32" Foreground="#92400E" TextWrapping="Wrap"
+               Text="会话列表缺失时用修复；配置损坏时用基础配置恢复；关闭后台会结束所有 Codex 进程。" />
+
+    <TextBlock Classes="label" Canvas.Left="30" Canvas.Top="576" Width="90" Height="27" Text="打开快捷键" />
+    <TextBox x:Name="HotkeyBox" Canvas.Left="130" Canvas.Top="576" Width="165" Height="27" IsReadOnly="True"
+             AutomationProperties.Name="打开界面快捷键" />
+    <Button x:Name="HotkeyButton" Canvas.Left="310" Canvas.Top="573" Width="145" Height="32" Content="设置快捷键" />
+    <TextBlock Classes="label" Canvas.Left="475" Canvas.Top="576" Width="75" Height="27" Text="鼠标侧键" />
+    <ComboBox x:Name="MouseButtonBox" Canvas.Left="555" Canvas.Top="576" Width="105" Height="27" AutomationProperties.Name="鼠标侧键" />
+
+    <CheckBox x:Name="StartupCheckBox" Canvas.Left="30" Canvas.Top="618" Width="115" Height="24" Content="开机启动" />
+    <TextBlock x:Name="FooterText" Canvas.Left="155" Canvas.Top="616" Width="505" Height="45" Foreground="#586376" TextWrapping="Wrap"
+               Text="切换完成后请重新打开 Codex。快捷键和鼠标侧键都支持打开/收回后台。开机启动会直接驻留托盘。" />
+
+    <TextBlock x:Name="BackupLocationText" Canvas.Left="30" Canvas.Top="676" Width="630" Height="32" Foreground="#586376" TextTrimming="CharacterEllipsis" />
+    <TextBlock Canvas.Left="300" Canvas.Top="724" Width="360" Height="24" Foreground="#919191" TextAlignment="Right"
+               Text="github.com/yin-yizhen/codex-api-switcher" />
+  </Canvas>
+</Window>
