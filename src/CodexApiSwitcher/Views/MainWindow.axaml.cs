@@ -210,7 +210,7 @@ internal sealed partial class MainWindow : Window
         };
     }
 
-    private SwitcherService GetService() => new(rootBox.Text?.Trim() ?? string.Empty, Environment.ProcessPath ?? throw new InvalidOperationException("无法定位当前程序。"));
+    private SwitcherService GetService() => new(rootBox.Text?.Trim() ?? string.Empty, CurrentExecutable.Resolve());
 
     private async Task LoadRootSettingsAsync()
     {
@@ -230,7 +230,7 @@ internal sealed partial class MainWindow : Window
         {
             var loaded = await Task.Run(() =>
             {
-                var service = new SwitcherService(rootSnapshot, Environment.ProcessPath!);
+                var service = new SwitcherService(rootSnapshot, CurrentExecutable.Resolve());
                 return (service.GetStatus(), service.LoadSettings(), service.HasStoredToken(), service.LoadThirdPartyProfiles(), service.SecretBackendName);
             });
             if (!string.Equals(rootSnapshot, rootBox.Text?.Trim(), PathComparison)) return;
@@ -265,7 +265,7 @@ internal sealed partial class MainWindow : Window
             loadingStartup = true;
             hotkeyBox.Text = settings.GetOpenHotkey();
             mouseButtonBox.SelectedIndex = MouseButtonSetting.ParseOrDefault(settings.OpenMouseButton).ToComboIndex();
-            startupCheckBox.IsChecked = StartupManager.IsEnabled(Environment.ProcessPath!);
+            startupCheckBox.IsChecked = StartupManager.IsEnabled(CurrentExecutable.Resolve());
             loadingStartup = false;
         }
         catch
@@ -494,7 +494,7 @@ internal sealed partial class MainWindow : Window
         if (loadingStartup) return;
         try
         {
-            StartupManager.SetEnabled(startupCheckBox.IsChecked == true, Environment.ProcessPath!);
+            StartupManager.SetEnabled(startupCheckBox.IsChecked == true, CurrentExecutable.Resolve());
             SetStatus(startupCheckBox.IsChecked == true ? $"已开启开机启动；下次登录 {CodexPlatform.Description} 后会自动驻留后台。" : "已关闭开机启动。", Green, GreenSurface);
         }
         catch (Exception ex) { SetStatus("开机启动设置失败：" + ex.Message, Red, RedSurface); }

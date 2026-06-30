@@ -348,7 +348,11 @@ internal sealed partial class SwitcherService
 
     private void InstallStableCredentialHelper()
     {
-        if (!File.Exists(executablePath)) throw new FileNotFoundException("Current switcher executable was not found.", executablePath);
+        if (!File.Exists(executablePath))
+        {
+            var candidates = CurrentExecutable.DescribeCandidates();
+            throw new FileNotFoundException("Current switcher executable was not found. Tried: " + candidates, executablePath);
+        }
         Directory.CreateDirectory(dataDirectory);
         if (!PathEquals(executablePath, stableHelperPath)) File.Copy(executablePath, stableHelperPath, true);
         if (!OperatingSystem.IsWindows()) File.SetUnixFileMode(stableHelperPath,
