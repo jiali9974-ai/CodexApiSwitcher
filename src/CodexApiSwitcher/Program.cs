@@ -121,7 +121,7 @@ internal static class Program
     private static int RunCommand(Dictionary<string, string> options)
     {
         var root = GetOption(options, "--root", GetDefaultRoot());
-        var executable = Environment.ProcessPath ?? throw new InvalidOperationException("Unable to resolve the current executable path.");
+        var executable = CurrentExecutable.Resolve();
         var service = new SwitcherService(root, executable);
 
         if (options.ContainsKey("--platform-info"))
