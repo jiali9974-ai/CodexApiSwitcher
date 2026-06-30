@@ -51,9 +51,24 @@ xattr -dr com.apple.quarantine ./CodexApiSwitcher-macos-x64.app
 ## Windows 怎么打开
 
 1. 从 Release 下载 [CodexApiSwitcher-win-x64.exe](https://github.com/jiali9974-ai/CodexApiSwitcher/releases/download/v2.1.0/CodexApiSwitcher-win-x64.exe)。
-2. 双击 `CodexApiSwitcher-win-x64.exe`。
-3. 选择包含 `config.toml` 的 Codex 根目录。
-4. 如果 Windows 安全提示，请确认来源是你的仓库发布包后再允许运行。
+2. 双击 `CodexApiSwitcher-win-x64.exe`，可以直接从“下载”或“桌面”运行。
+3. 如果 Windows SmartScreen 或安全软件提示，请确认文件来源是本仓库 Release，再选择“更多信息”→“仍要运行”。
+4. 打开后选择包含 `config.toml` 的 Codex 根目录。
+   - 如果设置过 `CODEX_HOME`，通常选择该目录。
+   - 否则通常是用户目录下的 `.codex`，例如 `C:\Users\你的用户名\.codex`。
+5. 切换 API 前先彻底退出 Codex，或在 CAS 里点击“关闭 Codex 后台”。
+6. 填写第三方 Base URL、模型名和 API Key 后，点击“切换到第三方 API”。
+7. 切换完成后重新打开 Codex。
+
+Windows 版是自包含单文件程序。新电脑不需要先安装 .NET、Python、Visual Studio 或其他开发环境；下载 exe 后即可运行。
+
+首次切换第三方 API 时，CAS 会在你选择的 Codex 根目录下创建：
+
+```text
+api-switcher\CodexApiSwitcher.AuthHelper.exe
+```
+
+这个 helper 用来让 Codex 安全读取本机加密保存的第三方 API Key。API Key 使用 Windows DPAPI 保存，不会明文写进 `config.toml`。请保留 `api-switcher` 目录；如果误删，重新运行 CAS 并再次切换第三方 API 即可自动恢复。
 
 ## Linux 怎么打开
 
