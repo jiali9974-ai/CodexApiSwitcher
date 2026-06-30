@@ -46,6 +46,8 @@ xattr -dr com.apple.quarantine ./CodexApiSwitcher-macos-x64.app
 
 当前发布包使用 ad-hoc 签名，不是 Apple Developer ID 公证包，所以首次运行可能仍需要手动允许。
 
+新 Mac 不需要安装 Homebrew、.NET、Python 或 Xcode。macOS 发布包是自包含应用，只依赖系统自带框架。唯一可能需要用户手动处理的是 Gatekeeper 首次允许运行，以及全局快捷键/鼠标侧键所需的“辅助功能”权限。
+
 ## Windows 怎么打开
 
 1. 从 Release 下载 [CodexApiSwitcher-win-x64.exe](https://github.com/jiali9974-ai/CodexApiSwitcher/releases/download/v2.1.0/CodexApiSwitcher-win-x64.exe)。
@@ -228,6 +230,12 @@ powershell -NoProfile -ExecutionPolicy Bypass -File work\test-cross-platform.ps1
 ```
 
 ## 常见问题
+
+### 新 Mac 需要先安装什么环境？
+
+普通用户不需要安装任何开发环境。macOS 版下载 zip、解压、双击 `.app` 即可。它不依赖 Homebrew、.NET、Python、Xcode 或命令行工具。
+
+如果你要自己从源码构建，才需要安装 .NET 10 SDK。
 
 ### 为什么 Git 仓库里没有直接放 .app？
 

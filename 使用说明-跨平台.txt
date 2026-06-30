@@ -48,6 +48,8 @@ macOS 怎么打开
 
 当前 macOS 包为 ad-hoc 签名，不是 Apple Developer ID 公证包，首次运行可能仍需要手动允许。
 
+新 Mac 不需要安装 Homebrew、.NET、Python 或 Xcode。macOS 发布包是自包含应用，只依赖系统自带框架。唯一可能需要手动处理的是 Gatekeeper 首次允许运行，以及全局快捷键/鼠标侧键所需的“辅助功能”权限。
+
 
 Windows 怎么打开
 ----------------
@@ -204,6 +206,9 @@ CAS 主要修改：
 
 常见问题
 --------
+
+0. 新 Mac 需要先安装什么环境？
+   普通用户不需要安装任何开发环境。macOS 版下载 zip、解压、双击 .app 即可。它不依赖 Homebrew、.NET、Python、Xcode 或命令行工具。只有自己从源码构建时才需要 .NET 10 SDK。
 
 1. 为什么 Git 仓库里没有 .app 或 Windows exe？
    因为 .app 内自包含主程序和 Windows 自包含 exe 接近或超过 GitHub 普通 Git 单文件 100 MB 限制。请从 GitHub Releases 下载发布包。

@@ -70,6 +70,11 @@ osx-*)
 </plist>
 PLIST
   plutil -lint "$CONTENTS/Info.plist"
+  if otool -L "$MACOS/CodexApiSwitcher" | grep -E '/opt/homebrew|/usr/local' >/dev/null; then
+    echo "Refusing to ship a macOS app with Homebrew/local dynamic library dependencies:" >&2
+    otool -L "$MACOS/CodexApiSwitcher" >&2
+    exit 1
+  fi
   xattr -cr "$BUNDLE" 2>/dev/null || true
   codesign --force --deep --sign - --timestamp=none "$BUNDLE"
   codesign --verify --deep --strict "$BUNDLE"

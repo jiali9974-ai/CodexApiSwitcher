@@ -26,6 +26,7 @@ src/**/obj/
 outputs/cross-platform/
 .dotnet/
 .dotnet-home/
+.build-home/
 .nuget/
 work/baseline-win.png
 work/cross-ui-*.png
