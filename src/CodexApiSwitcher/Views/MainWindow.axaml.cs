@@ -40,6 +40,7 @@ internal sealed partial class MainWindow : Window
     private readonly Border statusBorder;
     private readonly TextBlock statusText;
     private readonly TextBlock keyStateText;
+    private readonly TextBlock armorStateText;
     private readonly TextBlock backupLocationText;
     private readonly TextBlock footerText;
     private readonly Button browseButton;
@@ -52,6 +53,8 @@ internal sealed partial class MainWindow : Window
     private readonly Button resetConfigButton;
     private readonly Button launchCodexButton;
     private readonly Button closeCodexButton;
+    private readonly Button armorButton;
+    private readonly Button restoreArmorButton;
     private readonly Button hotkeyButton;
     private readonly List<Control> operationControls = new();
     private List<ThirdPartyProfile> currentProfiles = new();
@@ -82,6 +85,7 @@ internal sealed partial class MainWindow : Window
         statusBorder = Find<Border>("StatusBorder");
         statusText = Find<TextBlock>("StatusText");
         keyStateText = Find<TextBlock>("KeyStateText");
+        armorStateText = Find<TextBlock>("ArmorStateText");
         backupLocationText = Find<TextBlock>("BackupLocationText");
         footerText = Find<TextBlock>("FooterText");
         browseButton = Find<Button>("BrowseButton");
@@ -94,6 +98,8 @@ internal sealed partial class MainWindow : Window
         resetConfigButton = Find<Button>("ResetConfigButton");
         launchCodexButton = Find<Button>("LaunchCodexButton");
         closeCodexButton = Find<Button>("CloseCodexButton");
+        armorButton = Find<Button>("ArmorButton");
+        restoreArmorButton = Find<Button>("RestoreArmorButton");
         hotkeyButton = Find<Button>("HotkeyButton");
 
         operationControls.AddRange(new Control[]
@@ -101,7 +107,7 @@ internal sealed partial class MainWindow : Window
             profileBox, urlBox, thirdPartyModelBox, officialModelBox, keyBox, compatibilityCheckBox,
             browseButton, saveProfileButton, deleteProfileButton, thirdPartyButton, officialButton,
             rollbackButton, repairButton, resetConfigButton, launchCodexButton, closeCodexButton,
-            hotkeyButton, mouseButtonBox, startupCheckBox
+            armorButton, restoreArmorButton, hotkeyButton, mouseButtonBox, startupCheckBox
         });
 
         rootBox.Text = initialRoot;
@@ -170,6 +176,8 @@ internal sealed partial class MainWindow : Window
         resetConfigButton.Click += async (_, _) => await ResetConfigAsync();
         launchCodexButton.Click += async (_, _) => await LaunchCodexFromTrayAsync();
         closeCodexButton.Click += async (_, _) => await CloseCodexFromTrayAsync();
+        armorButton.Click += async (_, _) => await EnableArmorAsync();
+        restoreArmorButton.Click += async (_, _) => await RestoreArmorAsync();
         hotkeyButton.Click += (_, _) => BeginHotkeyCapture();
         profileBox.SelectionChanged += (_, _) => ProfileSelectionChanged();
         mouseButtonBox.SelectionChanged += (_, _) => MouseButtonSelectionChanged();
@@ -231,10 +239,10 @@ internal sealed partial class MainWindow : Window
             var loaded = await Task.Run(() =>
             {
                 var service = new SwitcherService(rootSnapshot, CurrentExecutable.Resolve());
-                return (service.GetStatus(), service.LoadSettings(), service.HasStoredToken(), service.LoadThirdPartyProfiles(), service.SecretBackendName);
+                return (service.GetStatus(), service.GetArmorStatus(), service.LoadSettings(), service.HasStoredToken(), service.LoadThirdPartyProfiles(), service.SecretBackendName);
             });
             if (!string.Equals(rootSnapshot, rootBox.Text?.Trim(), PathComparison)) return;
-            var (status, settings, storedToken, profiles, backend) = loaded;
+            var (status, armorStatus, settings, storedToken, profiles, backend) = loaded;
             urlBox.Text = settings.BaseUrl.Length > 0 ? settings.BaseUrl : status.BaseUrl.Length > 0 ? status.BaseUrl : "https://api.example.com";
             thirdPartyModelBox.Text = settings.ThirdPartyModel.Length > 0 ? settings.ThirdPartyModel : status.Model.Length > 0 ? status.Model : "gpt-5.5";
             officialModelBox.Text = settings.OfficialModel.Length > 0 ? settings.OfficialModel : "gpt-5.5";
@@ -243,11 +251,15 @@ internal sealed partial class MainWindow : Window
             RefreshProfiles(profiles, string.Empty);
             keyStateText.Text = storedToken ? $"已通过 {backend} 保存默认 Key；留空即可继续使用。" : $"尚未保存 Key。首次切换时将使用 {backend} 安全保存。";
             keyStateText.Foreground = storedToken ? Green : Amber;
+            armorStateText.Text = armorStatus.ToDisplayString();
+            armorStateText.Foreground = armorStatus.IsEnabled ? Green : Muted;
             SetStatus("当前状态：" + status.ToDisplayString(), status.IsThirdParty ? Blue : Ink, status.IsThirdParty ? BlueSurface : White);
         }
         catch (Exception ex)
         {
             SetStatus("无法读取配置：" + ex.Message, Red, RedSurface);
+            armorStateText.Text = "破甲状态：无法读取。";
+            armorStateText.Foreground = Red;
         }
         finally
         {
@@ -406,6 +418,44 @@ internal sealed partial class MainWindow : Window
             var model = officialModelBox.Text ?? "gpt-5.5";
             await Task.Run(() => service.ResetModelConfiguration(model));
             await DialogWindow.ShowMessageAsync(this, "恢复完成", "基础模型配置已恢复为官方 OpenAI 登录。原 config.toml 已备份，MCP 和其他无关配置已保留。");
+        });
+    }
+
+    private async Task EnableArmorAsync()
+    {
+        try
+        {
+            var currentService = GetService();
+            if (!currentService.GetStatus().IsThirdParty && currentService.ShouldShowArmorThirdPartyReminder())
+            {
+                currentService.MarkArmorThirdPartyReminderShown();
+                SetStatus("当前是官方登录。建议先切换到第三方 API 后再破甲；如果仍想在官方状态启用，请再次点击一键破甲。", Amber, AmberSurface);
+                await DialogWindow.ShowMessageAsync(this, "建议先切换第三方 API", "当前 Codex 仍是官方 OpenAI 登录状态。\n\n建议先切换到第三方 API 后再执行一键破甲。\n\n如果你仍然想在官方状态启用破甲，请再次点击“一键破甲”。此提醒只显示一次。");
+                await LoadRootSettingsAsync(true);
+                return;
+            }
+        }
+        catch (Exception ex)
+        {
+            SetStatus("操作失败：" + ex.Message, Red, RedSurface);
+            await DialogWindow.ShowMessageAsync(this, "操作失败", ex.Message);
+            return;
+        }
+        if (!await DialogWindow.ConfirmAsync(this, "确认一键破甲", "将先备份 config.toml，然后写入 GPT-5.5 破甲指令文件，并设置 model_instructions_file。\n\n请先彻底退出 Codex，再继续。")) return;
+        await RunActionAsync(armorButton, "正在启用一键破甲", async service =>
+        {
+            var result = await Task.Run(service.EnableArmor);
+            await DialogWindow.ShowMessageAsync(this, "破甲完成", result + "\n\n请重新打开 Codex。");
+        });
+    }
+
+    private async Task RestoreArmorAsync()
+    {
+        if (!await DialogWindow.ConfirmAsync(this, "确认一键还原", "将先备份 config.toml，然后恢复破甲前的 model_instructions_file 配置，并删除 CAS 写入的破甲指令文件。\n\n请先彻底退出 Codex，再继续。")) return;
+        await RunActionAsync(restoreArmorButton, "正在还原破甲配置", async service =>
+        {
+            var result = await Task.Run(service.RestoreArmor);
+            await DialogWindow.ShowMessageAsync(this, "还原完成", result + "\n\n请重新打开 Codex。");
         });
     }
 
@@ -603,6 +653,9 @@ internal sealed partial class MainWindow : Window
             });
 
             await RunUiSmokeStepAsync(report, "repair-sidebar-button", RepairSidebarAsync);
+            await RunUiSmokeStepAsync(report, "armor-reminder-button", EnableArmorAsync);
+            await RunUiSmokeStepAsync(report, "armor-button", EnableArmorAsync);
+            await RunUiSmokeStepAsync(report, "restore-armor-button", RestoreArmorAsync);
             await RunUiSmokeStepAsync(report, "rollback-button", RollbackAsync);
             await RunUiSmokeStepAsync(report, "launch-codex-button", LaunchCodexFromTrayAsync);
             await RunUiSmokeStepAsync(report, "close-codex-button", CloseCodexFromTrayAsync);

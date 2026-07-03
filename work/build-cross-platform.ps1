@@ -97,6 +97,19 @@ function New-ZipWithUnixModes([string]$SourceDirectory, [string]$ZipPath, [strin
     }
 }
 
+function New-MacDmg([string]$AppBundle, [string]$DmgPath, [string]$ScratchRoot) {
+    if (-not $IsMacOS) { return }
+    $hdiutil = Get-Command hdiutil -ErrorAction SilentlyContinue
+    if ($null -eq $hdiutil) { return }
+    if (Test-Path -LiteralPath $ScratchRoot) { Remove-Item -LiteralPath $ScratchRoot -Recurse -Force }
+    New-Item -ItemType Directory -Force -Path $ScratchRoot | Out-Null
+    Copy-Item -LiteralPath $AppBundle -Destination (Join-Path $ScratchRoot "Codex API Switcher.app") -Recurse -Force
+    New-Item -ItemType SymbolicLink -Path (Join-Path $ScratchRoot "Applications") -Target "/Applications" | Out-Null
+    if (Test-Path -LiteralPath $DmgPath) { Remove-Item -LiteralPath $DmgPath -Force }
+    & $hdiutil.Source create -volname "Codex API Switcher" -srcfolder $ScratchRoot -ov -format UDZO $DmgPath
+    if ($LASTEXITCODE -ne 0) { throw "hdiutil create failed for $DmgPath." }
+}
+
 if (-not $SkipRestore) {
     & $dotnet restore $project
     if ($LASTEXITCODE -ne 0) { throw "dotnet restore failed." }
@@ -147,8 +160,8 @@ foreach ($rid in @("linux-x64", "linux-arm64")) {
 }
 
 foreach ($item in @(
-    @{ Rid = "osx-arm64"; Name = "CodexApiSwitcher-macos-arm64.app"; Zip = "CodexApiSwitcher-macos-arm64.zip" },
-    @{ Rid = "osx-x64"; Name = "CodexApiSwitcher-macos-x64.app"; Zip = "CodexApiSwitcher-macos-x64.zip" }
+    @{ Rid = "osx-arm64"; Name = "CodexApiSwitcher-macos-arm64.app"; Zip = "CodexApiSwitcher-macos-arm64.zip"; Dmg = "CodexApiSwitcher-macos-arm64.dmg" },
+    @{ Rid = "osx-x64"; Name = "CodexApiSwitcher-macos-x64.app"; Zip = "CodexApiSwitcher-macos-x64.zip"; Dmg = "CodexApiSwitcher-macos-x64.dmg" }
 )) {
     if ($Runtime -notcontains $item.Rid) { continue }
     $source = Join-Path $outputRoot ($item.Rid + "\Codex API Switcher.app")
@@ -156,6 +169,8 @@ foreach ($item in @(
     $zipTarget = Join-Path $workspace $item.Zip
     Assert-InWorkspace $target
     Assert-InWorkspace $zipTarget
+    $dmgTarget = Join-Path $workspace $item.Dmg
+    Assert-InWorkspace $dmgTarget
     if (Test-Path -LiteralPath $target) {
         $resolvedTarget = [System.IO.Path]::GetFullPath($target)
         if (-not $resolvedTarget.StartsWith($workspaceFull + [System.IO.Path]::DirectorySeparatorChar, [System.StringComparison]::OrdinalIgnoreCase)) {
@@ -165,6 +180,7 @@ foreach ($item in @(
     }
     Copy-Item -LiteralPath $source -Destination $target -Recurse -Force
     New-ZipWithUnixModes $target $zipTarget $item.Name
+    New-MacDmg $target $dmgTarget (Join-Path $outputRoot ($item.Rid + "\dmg-root"))
 }
 
 Get-ChildItem -LiteralPath $outputRoot -Recurse -File |

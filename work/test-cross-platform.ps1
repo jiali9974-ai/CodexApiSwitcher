@@ -93,6 +93,22 @@ try {
     if ($officialConfig -notmatch '(?m)^model_provider = "openai"\r?$') { throw "Official provider was not restored." }
     if ($officialConfig -match '(?m)^\[model_providers\.custom(?:\.|\])') { throw "Custom provider sections remained in official mode." }
 
+    $armorStatus = & $Executable --armor-status --root $root
+    if ($LASTEXITCODE -ne 0 -or $armorStatus -notmatch "未启用") { throw "Armor status before enabling failed: $armorStatus" }
+    $armorOutput = & $Executable --enable-armor --root $root
+    if ($LASTEXITCODE -ne 0 -or $armorOutput -notmatch "已启用一键破甲") { throw "Enable armor failed: $armorOutput" }
+    $armorConfig = Get-Content -LiteralPath $config -Raw -Encoding UTF8
+    if ($armorConfig -notmatch '(?m)^model_instructions_file = "\./gpt5\.5-unrestricted\.md"\r?$') { throw "Armor model_instructions_file was not written." }
+    $armorFile = Join-Path $root "gpt5.5-unrestricted.md"
+    if (-not (Test-Path -LiteralPath $armorFile)) { throw "Armor instructions file was not written." }
+    $enabledArmorStatus = & $Executable --armor-status --root $root
+    if ($LASTEXITCODE -ne 0 -or $enabledArmorStatus -notmatch "已启用") { throw "Armor status after enabling failed: $enabledArmorStatus" }
+    $restoreArmorOutput = & $Executable --restore-armor --root $root
+    if ($LASTEXITCODE -ne 0 -or $restoreArmorOutput -notmatch "已移除") { throw "Restore armor failed: $restoreArmorOutput" }
+    $restoredArmorConfig = Get-Content -LiteralPath $config -Raw -Encoding UTF8
+    if ($restoredArmorConfig -match '(?m)^model_instructions_file\s*=') { throw "Armor model_instructions_file remained after restore." }
+    if (Test-Path -LiteralPath $armorFile) { throw "Armor instructions file remained after restore." }
+
     $originalStartup = & $Executable --show-startup
     $startupChanged = $true
     $enabled = & $Executable --enable-startup
@@ -113,7 +129,7 @@ try {
         throw "UI button smoke test failed: $reportText"
     }
     $uiReportText = Get-Content -LiteralPath $uiSmokeReport -Raw -Encoding UTF8
-    foreach ($expected in @("save-profile-button", "delete-profile-button", "switch-third-party-button", "switch-official-button", "reset-config-button", "repair-sidebar-button", "rollback-button", "launch-codex-button", "close-codex-button")) {
+    foreach ($expected in @("save-profile-button", "delete-profile-button", "switch-third-party-button", "switch-official-button", "reset-config-button", "repair-sidebar-button", "armor-reminder-button", "armor-button", "restore-armor-button", "rollback-button", "launch-codex-button", "close-codex-button")) {
         if ($uiReportText -notmatch [regex]::Escape("PASS " + $expected)) { throw "UI button smoke test did not cover: $expected`n$uiReportText" }
     }
 

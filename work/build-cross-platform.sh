@@ -35,7 +35,10 @@ DESTINATION="$WORKSPACE/outputs/cross-platform/$RID"
   -p:DebugType=None \
   -p:DebugSymbols=false
 
-chmod +x "$DESTINATION/CodexApiSwitcher"
+case "$RID" in
+  win-*) ;;
+  *) chmod +x "$DESTINATION/CodexApiSwitcher" ;;
+esac
 case "$RID" in
 osx-*)
   BUNDLE="$DESTINATION/Codex API Switcher.app"
@@ -96,6 +99,15 @@ case "$RID" in
     chmod +x "$WORKSPACE/CodexApiSwitcher-macos-arm64.app/Contents/MacOS/CodexApiSwitcher"
     rm -f "$WORKSPACE/CodexApiSwitcher-macos-arm64.zip"
     ditto -c -k --sequesterRsrc --keepParent "$WORKSPACE/CodexApiSwitcher-macos-arm64.app" "$WORKSPACE/CodexApiSwitcher-macos-arm64.zip"
+    if command -v hdiutil >/dev/null 2>&1; then
+      DMG_ROOT="$DESTINATION/dmg-root-arm64"
+      rm -rf "$DMG_ROOT"
+      mkdir -p "$DMG_ROOT"
+      cp -R "$WORKSPACE/CodexApiSwitcher-macos-arm64.app" "$DMG_ROOT/Codex API Switcher.app"
+      ln -s /Applications "$DMG_ROOT/Applications"
+      rm -f "$WORKSPACE/CodexApiSwitcher-macos-arm64.dmg"
+      hdiutil create -volname "Codex API Switcher" -srcfolder "$DMG_ROOT" -ov -format UDZO "$WORKSPACE/CodexApiSwitcher-macos-arm64.dmg"
+    fi
     ;;
   osx-x64)
     rm -rf "$WORKSPACE/CodexApiSwitcher-macos-x64.app"
@@ -103,5 +115,14 @@ case "$RID" in
     chmod +x "$WORKSPACE/CodexApiSwitcher-macos-x64.app/Contents/MacOS/CodexApiSwitcher"
     rm -f "$WORKSPACE/CodexApiSwitcher-macos-x64.zip"
     ditto -c -k --sequesterRsrc --keepParent "$WORKSPACE/CodexApiSwitcher-macos-x64.app" "$WORKSPACE/CodexApiSwitcher-macos-x64.zip"
+    if command -v hdiutil >/dev/null 2>&1; then
+      DMG_ROOT="$DESTINATION/dmg-root-x64"
+      rm -rf "$DMG_ROOT"
+      mkdir -p "$DMG_ROOT"
+      cp -R "$WORKSPACE/CodexApiSwitcher-macos-x64.app" "$DMG_ROOT/Codex API Switcher.app"
+      ln -s /Applications "$DMG_ROOT/Applications"
+      rm -f "$WORKSPACE/CodexApiSwitcher-macos-x64.dmg"
+      hdiutil create -volname "Codex API Switcher" -srcfolder "$DMG_ROOT" -ov -format UDZO "$WORKSPACE/CodexApiSwitcher-macos-x64.dmg"
+    fi
     ;;
 esac

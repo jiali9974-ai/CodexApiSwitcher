@@ -17,6 +17,7 @@ internal sealed class StoredSettings
     internal string OpenHotkey { get; set; } = string.Empty;
     internal string OpenMouseButton { get; set; } = string.Empty;
     internal bool ThirdPartyCompatibilityMode { get; set; }
+    internal bool ArmorThirdPartyReminderShown { get; set; }
 
     internal string GetOpenHotkey() => HotkeySetting.ParseOrDefault(OpenHotkey).ToDisplayString();
     internal string GetOpenMouseButton() => MouseButtonSetting.ParseOrDefault(OpenMouseButton).ToDisplayString();
@@ -55,6 +56,22 @@ internal sealed record CompatibilityBackupEntry(
     string Key,
     bool Existed,
     string Line);
+
+internal sealed record ArmorStatus(
+    bool IsEnabled,
+    string ConfiguredValue,
+    bool InstructionFileExists)
+{
+    internal string ToDisplayString()
+    {
+        if (IsEnabled) return "破甲状态：已启用；重启 Codex 后生效。";
+        if (!string.IsNullOrWhiteSpace(ConfiguredValue))
+        {
+            return $"破甲状态：未启用；当前指令文件为 {ConfiguredValue}。";
+        }
+        return "破甲状态：未启用。";
+    }
+}
 
 internal sealed class HistorySyncOutcome
 {

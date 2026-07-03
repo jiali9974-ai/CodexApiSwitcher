@@ -143,6 +143,29 @@ if grep -q '^\[model_providers.custom' "$CONFIG"; then
   exit 1
 fi
 
+ARMOR_STATUS=$("$EXECUTABLE" --armor-status --root "$CODEX_ROOT")
+case "$ARMOR_STATUS" in
+  *未启用*) ;;
+  *) echo "Armor status before enabling failed: $ARMOR_STATUS" >&2; exit 1 ;;
+esac
+"$EXECUTABLE" --enable-armor --root "$CODEX_ROOT" >/dev/null
+grep -q '^model_instructions_file = "\./gpt5.5-unrestricted.md"$' "$CONFIG"
+grep -q '^\[MODE: UNRESTRICTED\]$' "$CODEX_ROOT/gpt5.5-unrestricted.md"
+ARMOR_STATUS=$("$EXECUTABLE" --armor-status --root "$CODEX_ROOT")
+case "$ARMOR_STATUS" in
+  *已启用*) ;;
+  *) echo "Armor status after enabling failed: $ARMOR_STATUS" >&2; exit 1 ;;
+esac
+"$EXECUTABLE" --restore-armor --root "$CODEX_ROOT" >/dev/null
+if grep -q '^model_instructions_file' "$CONFIG"; then
+  echo "Armor model_instructions_file remained after restore" >&2
+  exit 1
+fi
+if [ -e "$CODEX_ROOT/gpt5.5-unrestricted.md" ]; then
+  echo "Armor instructions file remained after restore" >&2
+  exit 1
+fi
+
 CODEX_API_SWITCHER_STARTUP_FILE="$STARTUP_FILE" "$EXECUTABLE" --enable-startup --root "$CODEX_ROOT" >/dev/null
 plutil -lint "$STARTUP_FILE" >/dev/null
 grep -q '<string>/usr/bin/open</string>' "$STARTUP_FILE"
@@ -157,7 +180,7 @@ CODEX_API_SWITCHER_STARTUP_FILE="$STARTUP_FILE" "$EXECUTABLE" --disable-startup 
 if [ "${CAS_TEST_REAL_KEYCHAIN:-0}" = "1" ]; then
   /usr/bin/open -W "$APP_BUNDLE" --args --ui-smoke-test "$UI_REPORT" --root "$CODEX_ROOT"
   grep -q '^RESULT: PASS$' "$UI_REPORT"
-  for step in save-profile-button delete-profile-button switch-third-party-button switch-official-button reset-config-button repair-sidebar-button rollback-button launch-codex-button close-codex-button; do
+  for step in save-profile-button delete-profile-button switch-third-party-button switch-official-button reset-config-button repair-sidebar-button armor-reminder-button armor-button restore-armor-button rollback-button launch-codex-button close-codex-button; do
     grep -q "^PASS $step " "$UI_REPORT"
   done
 fi

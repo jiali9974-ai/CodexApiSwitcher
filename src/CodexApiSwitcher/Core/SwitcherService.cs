@@ -20,6 +20,7 @@ internal sealed partial class SwitcherService
     private readonly string stableHelperPath;
     private readonly string codexApiKeyEnvironmentBackupPath;
     private readonly string compatibilityBackupPath;
+    private readonly string armorInstructionBackupPath;
     private readonly ISecretStore secretStore;
 
     internal SwitcherService(string rootPath, string exePath)
@@ -39,6 +40,7 @@ internal sealed partial class SwitcherService
             : "codex-api-switcher-auth-helper");
         codexApiKeyEnvironmentBackupPath = Path.Combine(dataDirectory, "codex-api-key.user-env.dat");
         compatibilityBackupPath = Path.Combine(dataDirectory, "third-party-compatibility.dat");
+        armorInstructionBackupPath = Path.Combine(dataDirectory, "model-instructions-file.dat");
         secretStore = SecretStoreFactory.Create(dataDirectory);
     }
 
@@ -78,6 +80,9 @@ internal sealed partial class SwitcherService
                 case "thirdPartyCompatibilityMode":
                     settings.ThirdPartyCompatibilityMode = value is "1" || value.Equals("true", StringComparison.OrdinalIgnoreCase) || value.Equals("yes", StringComparison.OrdinalIgnoreCase);
                     break;
+                case "armorThirdPartyReminderShown":
+                    settings.ArmorThirdPartyReminderShown = value is "1" || value.Equals("true", StringComparison.OrdinalIgnoreCase) || value.Equals("yes", StringComparison.OrdinalIgnoreCase);
+                    break;
             }
         }
         return settings;
@@ -98,6 +103,19 @@ internal sealed partial class SwitcherService
     }
 
     internal bool HasStoredToken() => secretStore.Exists(credentialPath);
+
+    internal bool ShouldShowArmorThirdPartyReminder()
+    {
+        var settings = LoadSettings();
+        return !settings.ArmorThirdPartyReminderShown;
+    }
+
+    internal void MarkArmorThirdPartyReminderShown()
+    {
+        var settings = LoadSettings();
+        settings.ArmorThirdPartyReminderShown = true;
+        SaveSettings(settings);
+    }
 
     internal string ReadToken()
     {
@@ -334,7 +352,8 @@ internal sealed partial class SwitcherService
             "officialModel=" + EncodeSetting(settings.OfficialModel),
             "openHotkey=" + EncodeSetting(settings.GetOpenHotkey()),
             "openMouseButton=" + EncodeSetting(settings.GetOpenMouseButton()),
-            "thirdPartyCompatibilityMode=" + EncodeSetting(settings.ThirdPartyCompatibilityMode ? "1" : "0")
+            "thirdPartyCompatibilityMode=" + EncodeSetting(settings.ThirdPartyCompatibilityMode ? "1" : "0"),
+            "armorThirdPartyReminderShown=" + EncodeSetting(settings.ArmorThirdPartyReminderShown ? "1" : "0")
         });
     }
 
