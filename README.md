@@ -151,6 +151,22 @@ Image generation is not enabled for this group
 
 兼容模式会临时关闭 Codex 生图、图片查看、Web 搜索和部分高级插件能力，减少中转站因为不支持这些工具而报错。切回官方或关闭兼容模式后，工具会恢复之前的配置。
 
+## Reconnecting 频繁出现怎么办
+
+如果 Codex 经常显示 `Reconnecting`，通常是 Codex 没有继承你的本地代理环境。先打开本地代理客户端，然后在 CAS 里点击：
+
+```text
+修复 Reconnecting
+```
+
+CAS 会自动检测 `127.0.0.1` 上的常见代理端口，例如 `1082`、`7890`、`1080`，并在你选择的 Codex 根目录写入 `.env`：
+
+- `HTTP_PROXY` / `HTTPS_PROXY`
+- `ALL_PROXY`
+- `NO_PROXY`
+
+如果 `.env` 已存在，CAS 会先备份到 `config-switcher-backups`。修复后请完全退出并重新打开 Codex。
+
 ## 会话列表不见了怎么办
 
 如果 Codex 左侧历史会话为空，先彻底退出 Codex，然后点击：

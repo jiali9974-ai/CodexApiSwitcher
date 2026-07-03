@@ -112,7 +112,7 @@ internal static class Program
     private static bool ShouldRunCommand(Dictionary<string, string> options) => options.Keys.Any(key => key is
         "--emit-token" or "--emit-profile-token" or "--status" or "--switch-third-party" or
         "--save-profile" or "--delete-profile" or "--list-profiles" or "--switch-official" or
-        "--rollback" or "--reset-config" or "--repair-sidebar" or "--armor-status" or
+        "--rollback" or "--reset-config" or "--repair-sidebar" or "--repair-reconnecting" or "--detect-proxy" or "--armor-status" or
         "--enable-armor" or "--restore-armor" or "--codex-launch-plan" or
         "--launch-codex" or "--close-codex" or "--normalize-hotkey" or "--save-hotkey" or
         "--show-hotkey" or "--normalize-mouse-button" or "--save-mouse-button" or
@@ -171,6 +171,8 @@ internal static class Program
         else if (options.ContainsKey("--rollback")) { service.Rollback(); Console.WriteLine("Restored the latest backup."); }
         else if (options.ContainsKey("--reset-config")) { service.ResetModelConfiguration(GetOption(options, "--model", "gpt-5.5")); Console.WriteLine("Rebuilt the model configuration for official OpenAI login."); }
         else if (options.ContainsKey("--repair-sidebar")) Console.WriteLine(service.RepairConversationIndex());
+        else if (options.ContainsKey("--detect-proxy")) Console.WriteLine(service.DetectLocalProxyEndpoint());
+        else if (options.ContainsKey("--repair-reconnecting")) Console.WriteLine(service.RepairReconnectingProxy().ToDisplayString());
         else if (options.ContainsKey("--armor-status")) Console.WriteLine(service.GetArmorStatus().ToDisplayString());
         else if (options.ContainsKey("--enable-armor")) Console.WriteLine(service.EnableArmor());
         else if (options.ContainsKey("--restore-armor")) Console.WriteLine(service.RestoreArmor());

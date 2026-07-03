@@ -3,12 +3,12 @@
         x:Class="CodexApiSwitcher.Views.MainWindow"
         x:Name="MainWindowRoot"
         Title="CAS - Codex API 切换器"
-        Width="690" Height="830"
-        MinWidth="690" MinHeight="830"
+        Width="690" Height="884"
+        MinWidth="690" MinHeight="884"
         WindowStartupLocation="CenterScreen"
         Icon="/Assets/cas-logo.ico"
         Background="#F7F9FC">
-  <Canvas Width="690" Height="830" Background="#F7F9FC">
+  <Canvas Width="690" Height="884" Background="#F7F9FC">
     <TextBlock Canvas.Left="28" Canvas.Top="20" Text="CAS · Codex API 切换器"
                FontSize="24" FontWeight="Bold" />
 
@@ -60,28 +60,29 @@
 
     <Button x:Name="RepairButton" Canvas.Left="30" Canvas.Top="484" Width="145" Height="42" Content="修复会话列表" />
     <Button x:Name="ResetConfigButton" Canvas.Left="190" Canvas.Top="484" Width="145" Height="42" Content="恢复基础配置" />
-    <Button x:Name="LaunchCodexButton" Classes="teal" Canvas.Left="350" Canvas.Top="484" Width="145" Height="42" Content="启动 Codex" />
+    <Button x:Name="RepairReconnectingButton" Classes="teal" Canvas.Left="350" Canvas.Top="484" Width="145" Height="42" Content="修复 Reconnecting" />
     <Button x:Name="CloseCodexButton" Classes="danger" Canvas.Left="510" Canvas.Top="484" Width="150" Height="42" Content="关闭 Codex 后台" />
-    <TextBlock Canvas.Left="30" Canvas.Top="538" Width="630" Height="32" Foreground="#92400E" TextWrapping="Wrap"
-               Text="会话列表缺失时用修复；配置损坏时用基础配置恢复；关闭后台会结束所有 Codex 进程。" />
+    <Button x:Name="LaunchCodexButton" Classes="teal" Canvas.Left="30" Canvas.Top="538" Width="145" Height="42" Content="启动 Codex" />
+    <TextBlock Canvas.Left="190" Canvas.Top="535" Width="470" Height="48" Foreground="#92400E" TextWrapping="Wrap"
+               Text="Reconnecting 频繁出现时，先打开本地代理，再点修复；CAS 会检测 127.0.0.1 常见代理端口并写入 Codex .env。" />
 
-    <Button x:Name="ArmorButton" Classes="primaryBlue" Canvas.Left="30" Canvas.Top="580" Width="145" Height="42" Content="一键破甲" />
-    <Button x:Name="RestoreArmorButton" Canvas.Left="190" Canvas.Top="580" Width="145" Height="42" Content="一键还原" />
-    <TextBlock x:Name="ArmorStateText" Canvas.Left="350" Canvas.Top="576" Width="310" Height="52" Foreground="#586376" TextWrapping="Wrap" />
+    <Button x:Name="ArmorButton" Classes="primaryBlue" Canvas.Left="30" Canvas.Top="604" Width="145" Height="42" Content="一键破甲" />
+    <Button x:Name="RestoreArmorButton" Canvas.Left="190" Canvas.Top="604" Width="145" Height="42" Content="一键还原" />
+    <TextBlock x:Name="ArmorStateText" Canvas.Left="350" Canvas.Top="600" Width="310" Height="52" Foreground="#586376" TextWrapping="Wrap" />
 
-    <TextBlock Classes="label" Canvas.Left="30" Canvas.Top="642" Width="90" Height="27" Text="打开快捷键" />
-    <TextBox x:Name="HotkeyBox" Canvas.Left="130" Canvas.Top="642" Width="165" Height="27" IsReadOnly="True"
+    <TextBlock Classes="label" Canvas.Left="30" Canvas.Top="666" Width="90" Height="27" Text="打开快捷键" />
+    <TextBox x:Name="HotkeyBox" Canvas.Left="130" Canvas.Top="666" Width="165" Height="27" IsReadOnly="True"
              AutomationProperties.Name="打开界面快捷键" />
-    <Button x:Name="HotkeyButton" Canvas.Left="310" Canvas.Top="639" Width="145" Height="32" Content="设置快捷键" />
-    <TextBlock Classes="label" Canvas.Left="475" Canvas.Top="642" Width="75" Height="27" Text="鼠标侧键" />
-    <ComboBox x:Name="MouseButtonBox" Canvas.Left="555" Canvas.Top="642" Width="105" Height="27" AutomationProperties.Name="鼠标侧键" />
+    <Button x:Name="HotkeyButton" Canvas.Left="310" Canvas.Top="663" Width="145" Height="32" Content="设置快捷键" />
+    <TextBlock Classes="label" Canvas.Left="475" Canvas.Top="666" Width="75" Height="27" Text="鼠标侧键" />
+    <ComboBox x:Name="MouseButtonBox" Canvas.Left="555" Canvas.Top="666" Width="105" Height="27" AutomationProperties.Name="鼠标侧键" />
 
-    <CheckBox x:Name="StartupCheckBox" Canvas.Left="30" Canvas.Top="684" Width="115" Height="24" Content="开机启动" />
-    <TextBlock x:Name="FooterText" Canvas.Left="155" Canvas.Top="682" Width="505" Height="45" Foreground="#586376" TextWrapping="Wrap"
+    <CheckBox x:Name="StartupCheckBox" Canvas.Left="30" Canvas.Top="708" Width="115" Height="24" Content="开机启动" />
+    <TextBlock x:Name="FooterText" Canvas.Left="155" Canvas.Top="706" Width="505" Height="45" Foreground="#586376" TextWrapping="Wrap"
                Text="切换完成后请重新打开 Codex。快捷键和鼠标侧键都支持打开/收回后台。开机启动会直接驻留托盘。" />
 
-    <TextBlock x:Name="BackupLocationText" Canvas.Left="30" Canvas.Top="742" Width="630" Height="32" Foreground="#586376" TextTrimming="CharacterEllipsis" />
-    <TextBlock Canvas.Left="300" Canvas.Top="794" Width="360" Height="24" Foreground="#919191" TextAlignment="Right"
+    <TextBlock x:Name="BackupLocationText" Canvas.Left="30" Canvas.Top="766" Width="630" Height="48" Foreground="#586376" TextTrimming="CharacterEllipsis" />
+    <TextBlock Canvas.Left="300" Canvas.Top="848" Width="360" Height="24" Foreground="#919191" TextAlignment="Right"
                Text="github.com/yin-yizhen/codex-api-switcher" />
   </Canvas>
 </Window>

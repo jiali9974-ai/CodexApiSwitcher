@@ -51,6 +51,7 @@ internal sealed partial class MainWindow : Window
     private readonly Button rollbackButton;
     private readonly Button repairButton;
     private readonly Button resetConfigButton;
+    private readonly Button repairReconnectingButton;
     private readonly Button launchCodexButton;
     private readonly Button closeCodexButton;
     private readonly Button armorButton;
@@ -96,6 +97,7 @@ internal sealed partial class MainWindow : Window
         rollbackButton = Find<Button>("RollbackButton");
         repairButton = Find<Button>("RepairButton");
         resetConfigButton = Find<Button>("ResetConfigButton");
+        repairReconnectingButton = Find<Button>("RepairReconnectingButton");
         launchCodexButton = Find<Button>("LaunchCodexButton");
         closeCodexButton = Find<Button>("CloseCodexButton");
         armorButton = Find<Button>("ArmorButton");
@@ -106,7 +108,7 @@ internal sealed partial class MainWindow : Window
         {
             profileBox, urlBox, thirdPartyModelBox, officialModelBox, keyBox, compatibilityCheckBox,
             browseButton, saveProfileButton, deleteProfileButton, thirdPartyButton, officialButton,
-            rollbackButton, repairButton, resetConfigButton, launchCodexButton, closeCodexButton,
+            rollbackButton, repairButton, resetConfigButton, repairReconnectingButton, launchCodexButton, closeCodexButton,
             armorButton, restoreArmorButton, hotkeyButton, mouseButtonBox, startupCheckBox
         });
 
@@ -174,6 +176,7 @@ internal sealed partial class MainWindow : Window
         rollbackButton.Click += async (_, _) => await RollbackAsync();
         repairButton.Click += async (_, _) => await RepairSidebarAsync();
         resetConfigButton.Click += async (_, _) => await ResetConfigAsync();
+        repairReconnectingButton.Click += async (_, _) => await RepairReconnectingAsync();
         launchCodexButton.Click += async (_, _) => await LaunchCodexFromTrayAsync();
         closeCodexButton.Click += async (_, _) => await CloseCodexFromTrayAsync();
         armorButton.Click += async (_, _) => await EnableArmorAsync();
@@ -407,6 +410,17 @@ internal sealed partial class MainWindow : Window
         {
             var result = await Task.Run(service.RepairConversationIndex);
             await DialogWindow.ShowMessageAsync(this, "修复完成", result + "\n\n请重新打开 Codex 检查侧栏。");
+        });
+    }
+
+
+    private async Task RepairReconnectingAsync()
+    {
+        if (!await DialogWindow.ConfirmAsync(this, "确认修复 Reconnecting", "请先打开你的本地代理客户端。CAS 会自动检测 127.0.0.1 的常见代理端口，并写入 Codex 根目录下的 .env 文件：\n\nHTTP_PROXY / HTTPS_PROXY\nALL_PROXY\nNO_PROXY\n\n如果 .env 已存在，会先备份到 config-switcher-backups。操作后请完全退出并重新打开 Codex。")) return;
+        await RunActionAsync(repairReconnectingButton, "正在修复 Reconnecting", async service =>
+        {
+            var result = await Task.Run(service.RepairReconnectingProxy);
+            await DialogWindow.ShowMessageAsync(this, "修复完成", result.ToDisplayString() + "\n\n请完全退出并重新打开 Codex，让新的代理配置生效。");
         });
     }
 

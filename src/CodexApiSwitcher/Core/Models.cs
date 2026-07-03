@@ -50,6 +50,24 @@ internal sealed record ProviderStatus(
     }
 }
 
+
+internal sealed record ReconnectingRepairResult(
+    string EnvPath,
+    string ProxyUrl,
+    string AllProxyUrl,
+    bool ExistingFileBackedUp,
+    string BackupPath,
+    bool ProbeSucceeded,
+    string ProbeMessage)
+{
+    internal string ToDisplayString()
+    {
+        var backup = ExistingFileBackedUp ? $"\n原 .env 已备份到：{BackupPath}" : string.Empty;
+        var probe = ProbeSucceeded ? "代理端口连通性检测通过。" : "未完成代理端口连通性检测：" + ProbeMessage;
+        return $"已写入 Codex 代理配置：{EnvPath}\nHTTP/HTTPS_PROXY = {ProxyUrl}\nALL_PROXY = {AllProxyUrl}{backup}\n{probe}";
+    }
+}
+
 internal sealed record CompatibilityBackupEntry(
     string Scope,
     string Section,
