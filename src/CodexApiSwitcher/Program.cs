@@ -113,7 +113,8 @@ internal static class Program
         "--emit-token" or "--emit-profile-token" or "--status" or "--switch-third-party" or
         "--save-profile" or "--delete-profile" or "--list-profiles" or "--switch-official" or
         "--rollback" or "--reset-config" or "--repair-sidebar" or "--repair-reconnecting" or "--detect-proxy" or "--armor-status" or
-        "--enable-armor" or "--restore-armor" or "--codex-launch-plan" or
+        "--enable-armor" or "--restore-armor" or "--list-conversations" or "--export-conversations" or
+        "--import-conversations" or "--delete-conversations" or "--codex-launch-plan" or
         "--launch-codex" or "--close-codex" or "--normalize-hotkey" or "--save-hotkey" or
         "--show-hotkey" or "--normalize-mouse-button" or "--save-mouse-button" or
         "--show-mouse-button" or "--enable-startup" or "--disable-startup" or
@@ -176,6 +177,24 @@ internal static class Program
         else if (options.ContainsKey("--armor-status")) Console.WriteLine(service.GetArmorStatus().ToDisplayString());
         else if (options.ContainsKey("--enable-armor")) Console.WriteLine(service.EnableArmor());
         else if (options.ContainsKey("--restore-armor")) Console.WriteLine(service.RestoreArmor());
+        else if (options.ContainsKey("--list-conversations"))
+        {
+            foreach (var item in service.ListConversations(GetOption(options, "--query", string.Empty)))
+            {
+                Console.WriteLine(string.Join("|", new[]
+                {
+                    item.Id,
+                    item.DisplayTitle.Replace("|", " "),
+                    item.UpdatedAt == DateTimeOffset.MinValue ? string.Empty : item.UpdatedAt.ToString("O"),
+                    item.Model.Replace("|", " "),
+                    item.ModelProvider.Replace("|", " "),
+                    item.FileState
+                }));
+            }
+        }
+        else if (options.ContainsKey("--export-conversations")) Console.WriteLine(service.ExportConversations(ParseIdList(RequireOption(options, "--ids")), RequireOption(options, "--output")).ToDisplayString());
+        else if (options.ContainsKey("--import-conversations")) Console.WriteLine(service.ImportConversations(RequireOption(options, "--input")).ToDisplayString());
+        else if (options.ContainsKey("--delete-conversations")) Console.WriteLine(service.DeleteConversations(ParseIdList(RequireOption(options, "--ids"))).ToDisplayString());
         else if (options.ContainsKey("--codex-launch-plan")) Console.WriteLine(service.GetCodexLaunchPlan());
         else if (options.ContainsKey("--launch-codex")) Console.WriteLine(service.LaunchCodex());
         else if (options.ContainsKey("--close-codex")) Console.WriteLine(service.CloseCodexProcesses(options.ContainsKey("--dry-run")));
@@ -201,6 +220,11 @@ internal static class Program
         else throw new InvalidOperationException("Unknown command.");
         return 0;
     }
+
+    private static List<string> ParseIdList(string value) => value
+        .Split(new[] { ',', ';', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+        .Where(item => item.Length > 0)
+        .ToList();
 
     private static Dictionary<string, string> ParseArgs(string[] args)
     {

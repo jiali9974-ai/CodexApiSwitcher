@@ -166,6 +166,37 @@ if [ -e "$CODEX_ROOT/gpt5.5-unrestricted.md" ]; then
   exit 1
 fi
 
+
+CONV_PACKAGE="$TEST_ROOT/conversations.casconv.zip"
+LIST_OUTPUT=$("$EXECUTABLE" --list-conversations --root "$CODEX_ROOT" --query hello)
+case "$LIST_OUTPUT" in
+  *user-1*|*hello*) ;;
+  *) echo "Conversation list did not include fixture thread: $LIST_OUTPUT" >&2; exit 1 ;;
+esac
+"$EXECUTABLE" --export-conversations --root "$CODEX_ROOT" --ids user-1 --output "$CONV_PACKAGE" >/dev/null
+[ -s "$CONV_PACKAGE" ] || { echo "Conversation package was not created" >&2; exit 1; }
+IMPORT_ROOT="$TEST_ROOT/import root"
+mkdir -p "$IMPORT_ROOT/sessions/2026/06/29" "$IMPORT_ROOT/sqlite"
+printf '%s\n' 'model_provider = "openai"' 'model = "gpt-5.5"' > "$IMPORT_ROOT/config.toml"
+"$PYTHON" - "$IMPORT_ROOT/sqlite/state_5.sqlite" <<'PYFIXTURE'
+import sqlite3, sys
+connection = sqlite3.connect(sys.argv[1])
+connection.execute("create table threads(id text primary key, rollout_path text not null, source text not null, first_user_message text not null, has_user_event integer not null default 0, model_provider text not null, title text not null default '', updated_at integer not null default 0, updated_at_ms integer, model text, preview text not null default '')")
+connection.commit()
+connection.close()
+PYFIXTURE
+"$EXECUTABLE" --import-conversations --root "$IMPORT_ROOT" --input "$CONV_PACKAGE" >/dev/null
+IMPORTED=$("$EXECUTABLE" --list-conversations --root "$IMPORT_ROOT" --query hello)
+case "$IMPORTED" in
+  *user-1*) ;;
+  *) echo "Imported conversation was not listed: $IMPORTED" >&2; exit 1 ;;
+esac
+"$EXECUTABLE" --delete-conversations --root "$IMPORT_ROOT" --ids user-1 >/dev/null
+DELETED=$("$EXECUTABLE" --list-conversations --root "$IMPORT_ROOT" --query hello)
+case "$DELETED" in
+  *user-1*) echo "Deleted conversation still listed: $DELETED" >&2; exit 1 ;;
+esac
+
 CODEX_API_SWITCHER_STARTUP_FILE="$STARTUP_FILE" "$EXECUTABLE" --enable-startup --root "$CODEX_ROOT" >/dev/null
 plutil -lint "$STARTUP_FILE" >/dev/null
 grep -q '<string>/usr/bin/open</string>' "$STARTUP_FILE"
@@ -180,7 +211,7 @@ CODEX_API_SWITCHER_STARTUP_FILE="$STARTUP_FILE" "$EXECUTABLE" --disable-startup 
 if [ "${CAS_TEST_REAL_KEYCHAIN:-0}" = "1" ]; then
   /usr/bin/open -W "$APP_BUNDLE" --args --ui-smoke-test "$UI_REPORT" --root "$CODEX_ROOT"
   grep -q '^RESULT: PASS$' "$UI_REPORT"
-  for step in save-profile-button delete-profile-button switch-third-party-button switch-official-button reset-config-button repair-sidebar-button armor-reminder-button armor-button restore-armor-button rollback-button launch-codex-button close-codex-button; do
+  for step in save-profile-button delete-profile-button switch-third-party-button switch-official-button reset-config-button repair-sidebar-button history-manager-button armor-reminder-button armor-button restore-armor-button rollback-button launch-codex-button close-codex-button; do
     grep -q "^PASS $step " "$UI_REPORT"
   done
 fi

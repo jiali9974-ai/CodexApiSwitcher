@@ -5,7 +5,7 @@ Codex API Switcher 跨平台版使用说明
 --------
 
 GitHub Release：
-https://github.com/jiali9974-ai/CodexApiSwitcher/releases/tag/v2.1.0
+https://github.com/jiali9974-ai/CodexApiSwitcher/releases/tag/v2.2.0
 
 macOS：
 - Apple Silicon / M 系列：CodexApiSwitcher-macos-arm64.zip
@@ -13,7 +13,7 @@ macOS：
 
 Windows：
 - CodexApiSwitcher-win-x64.exe
-  下载：https://github.com/jiali9974-ai/CodexApiSwitcher/releases/download/v2.1.0/CodexApiSwitcher-win-x64.exe
+  下载：https://github.com/jiali9974-ai/CodexApiSwitcher/releases/download/v2.2.0/CodexApiSwitcher-win-x64.exe
 
 Linux：
 - CodexApiSwitcher-linux-x64
@@ -55,7 +55,7 @@ Windows 怎么打开
 ----------------
 
 1. 从 Release 下载 CodexApiSwitcher-win-x64.exe：
-   https://github.com/jiali9974-ai/CodexApiSwitcher/releases/download/v2.1.0/CodexApiSwitcher-win-x64.exe
+   https://github.com/jiali9974-ai/CodexApiSwitcher/releases/download/v2.2.0/CodexApiSwitcher-win-x64.exe
 2. 双击 CodexApiSwitcher-win-x64.exe。
 3. 选择包含 config.toml 的 Codex 根目录。
 4. 如果 Windows 安全提示，请确认文件来源后再允许运行。

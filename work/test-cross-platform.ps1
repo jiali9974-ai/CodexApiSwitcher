@@ -18,6 +18,8 @@ $singleRoot = Join-Path $PSScriptRoot ("cross-single-root-" + [guid]::NewGuid().
 $originalStartup = $null
 $startupChanged = $false
 $singleProcess = $null
+$importRoot = $null
+$conversationPackage = $null
 
 function New-CodexFixtureRoot([string]$Path, [string]$Model = "gpt-5.5") {
     New-Item -ItemType Directory -Path $Path | Out-Null
@@ -109,6 +111,35 @@ try {
     if ($restoredArmorConfig -match '(?m)^model_instructions_file\s*=') { throw "Armor model_instructions_file remained after restore." }
     if (Test-Path -LiteralPath $armorFile) { throw "Armor instructions file remained after restore." }
 
+
+    $conversationList = & $Executable --list-conversations --root $root --query "hello"
+    if ($LASTEXITCODE -ne 0 -or $conversationList -notmatch "user-1") { throw "Conversation list failed: $conversationList" }
+    $conversationPackage = Join-Path $PSScriptRoot ("cross-conversations-" + [guid]::NewGuid().ToString("N") + ".casconv.zip")
+    $conversationExport = & $Executable --export-conversations --root $root --ids "user-1" --output $conversationPackage
+    if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $conversationPackage)) { throw "Conversation export failed: $conversationExport" }
+    $importRoot = Join-Path $PSScriptRoot ("cross-import-root-" + [guid]::NewGuid().ToString("N"))
+    New-Item -ItemType Directory -Path (Join-Path $importRoot "sessions\2026\06\29") -Force | Out-Null
+    New-Item -ItemType Directory -Path (Join-Path $importRoot "sqlite") -Force | Out-Null
+    [System.IO.File]::WriteAllText((Join-Path $importRoot "config.toml"), "model_provider = `"openai`"`nmodel = `"gpt-5.5`"`n", [System.Text.UTF8Encoding]::new($false))
+    $importDatabase = Join-Path $importRoot "sqlite\state_5.sqlite"
+    $createImportDb = @"
+import sqlite3, sys
+connection = sqlite3.connect(sys.argv[1])
+connection.execute("create table threads(id text primary key, rollout_path text not null, source text not null, first_user_message text not null, has_user_event integer not null default 0, model_provider text not null, title text not null default '', updated_at integer not null default 0, updated_at_ms integer, model text, preview text not null default '')")
+connection.commit()
+connection.close()
+"@
+    $createImportDb | python - $importDatabase
+    if ($LASTEXITCODE -ne 0) { throw "Unable to create import SQLite fixture." }
+    $conversationImport = & $Executable --import-conversations --root $importRoot --input $conversationPackage
+    if ($LASTEXITCODE -ne 0) { throw "Conversation import failed: $conversationImport" }
+    $importedList = & $Executable --list-conversations --root $importRoot --query "hello"
+    if ($LASTEXITCODE -ne 0 -or $importedList -notmatch "user-1") { throw "Imported conversation was not listed: $importedList" }
+    $conversationDelete = & $Executable --delete-conversations --root $importRoot --ids "user-1"
+    if ($LASTEXITCODE -ne 0) { throw "Conversation delete failed: $conversationDelete" }
+    $deletedList = & $Executable --list-conversations --root $importRoot --query "hello"
+    if ($deletedList -match "user-1") { throw "Deleted conversation still listed: $deletedList" }
+
     $originalStartup = & $Executable --show-startup
     $startupChanged = $true
     $enabled = & $Executable --enable-startup
@@ -129,7 +160,7 @@ try {
         throw "UI button smoke test failed: $reportText"
     }
     $uiReportText = Get-Content -LiteralPath $uiSmokeReport -Raw -Encoding UTF8
-    foreach ($expected in @("save-profile-button", "delete-profile-button", "switch-third-party-button", "switch-official-button", "reset-config-button", "repair-sidebar-button", "armor-reminder-button", "armor-button", "restore-armor-button", "rollback-button", "launch-codex-button", "close-codex-button")) {
+    foreach ($expected in @("save-profile-button", "delete-profile-button", "switch-third-party-button", "switch-official-button", "reset-config-button", "repair-sidebar-button", "history-manager-button", "armor-reminder-button", "armor-button", "restore-armor-button", "rollback-button", "launch-codex-button", "close-codex-button")) {
         if ($uiReportText -notmatch [regex]::Escape("PASS " + $expected)) { throw "UI button smoke test did not cover: $expected`n$uiReportText" }
     }
 
@@ -160,7 +191,7 @@ finally {
         else { & $Executable --disable-startup | Out-Null }
     }
     $workRoot = [System.IO.Path]::GetFullPath($PSScriptRoot).TrimEnd('\') + '\'
-    foreach ($candidate in @($root, $uiSmokeRoot, $singleRoot)) {
+    foreach ($candidate in @($root, $uiSmokeRoot, $singleRoot, $importRoot)) {
         $resolvedRoot = [System.IO.Path]::GetFullPath($candidate)
         if ($resolvedRoot.StartsWith($workRoot, [System.StringComparison]::OrdinalIgnoreCase) -and (Test-Path -LiteralPath $resolvedRoot)) {
             Remove-Item -LiteralPath $resolvedRoot -Recurse -Force
@@ -170,3 +201,4 @@ finally {
 
 Write-Output ("UI_SNAPSHOT=" + $snapshot)
 Write-Output ("UI_BUTTON_REPORT=" + $uiSmokeReport)
+if ($null -ne $conversationPackage -and (Test-Path -LiteralPath $conversationPackage)) { Remove-Item -LiteralPath $conversationPackage -Force }

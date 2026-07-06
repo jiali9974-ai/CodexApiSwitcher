@@ -56,6 +56,7 @@ internal sealed partial class MainWindow : Window
     private readonly Button closeCodexButton;
     private readonly Button armorButton;
     private readonly Button restoreArmorButton;
+    private readonly Button historyManagerButton;
     private readonly Button hotkeyButton;
     private readonly List<Control> operationControls = new();
     private List<ThirdPartyProfile> currentProfiles = new();
@@ -102,6 +103,7 @@ internal sealed partial class MainWindow : Window
         closeCodexButton = Find<Button>("CloseCodexButton");
         armorButton = Find<Button>("ArmorButton");
         restoreArmorButton = Find<Button>("RestoreArmorButton");
+        historyManagerButton = Find<Button>("HistoryManagerButton");
         hotkeyButton = Find<Button>("HotkeyButton");
 
         operationControls.AddRange(new Control[]
@@ -109,7 +111,7 @@ internal sealed partial class MainWindow : Window
             profileBox, urlBox, thirdPartyModelBox, officialModelBox, keyBox, compatibilityCheckBox,
             browseButton, saveProfileButton, deleteProfileButton, thirdPartyButton, officialButton,
             rollbackButton, repairButton, resetConfigButton, repairReconnectingButton, launchCodexButton, closeCodexButton,
-            armorButton, restoreArmorButton, hotkeyButton, mouseButtonBox, startupCheckBox
+            armorButton, restoreArmorButton, historyManagerButton, hotkeyButton, mouseButtonBox, startupCheckBox
         });
 
         rootBox.Text = initialRoot;
@@ -181,6 +183,7 @@ internal sealed partial class MainWindow : Window
         closeCodexButton.Click += async (_, _) => await CloseCodexFromTrayAsync();
         armorButton.Click += async (_, _) => await EnableArmorAsync();
         restoreArmorButton.Click += async (_, _) => await RestoreArmorAsync();
+        historyManagerButton.Click += async (_, _) => await OpenHistoryManagerAsync();
         hotkeyButton.Click += (_, _) => BeginHotkeyCapture();
         profileBox.SelectionChanged += (_, _) => ProfileSelectionChanged();
         mouseButtonBox.SelectionChanged += (_, _) => MouseButtonSelectionChanged();
@@ -435,6 +438,20 @@ internal sealed partial class MainWindow : Window
         });
     }
 
+    private async Task OpenHistoryManagerAsync()
+    {
+        try
+        {
+            var window = new HistoryManagerWindow(rootBox.Text?.Trim() ?? string.Empty, CurrentExecutable.Resolve());
+            await window.ShowDialog(this);
+        }
+        catch (Exception ex)
+        {
+            SetStatus("打开对话历史管理失败：" + ex.Message, Red, RedSurface);
+            await DialogWindow.ShowMessageAsync(this, "打开失败", ex.Message);
+        }
+    }
+
     private async Task EnableArmorAsync()
     {
         try
@@ -667,6 +684,12 @@ internal sealed partial class MainWindow : Window
             });
 
             await RunUiSmokeStepAsync(report, "repair-sidebar-button", RepairSidebarAsync);
+            await RunUiSmokeStepAsync(report, "history-manager-button", async () =>
+            {
+                var window = new HistoryManagerWindow(rootBox.Text?.Trim() ?? string.Empty, CurrentExecutable.Resolve());
+                await window.RunSmokeTestAsync();
+                window.Close();
+            });
             await RunUiSmokeStepAsync(report, "armor-reminder-button", EnableArmorAsync);
             await RunUiSmokeStepAsync(report, "armor-button", EnableArmorAsync);
             await RunUiSmokeStepAsync(report, "restore-armor-button", RestoreArmorAsync);

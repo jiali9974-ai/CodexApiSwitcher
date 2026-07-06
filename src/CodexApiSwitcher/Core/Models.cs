@@ -240,6 +240,78 @@ internal sealed class SessionMetadataSyncResult
     }
 }
 
+
+internal sealed record ConversationSummary(
+    string Id,
+    string Title,
+    string FirstUserMessage,
+    string Preview,
+    string Model,
+    string ModelProvider,
+    string Source,
+    string RolloutPath,
+    bool RolloutExists,
+    DateTimeOffset UpdatedAt,
+    long UpdatedAtUnix,
+    long UpdatedAtMs,
+    string DatabasePath)
+{
+    internal string DisplayTitle => string.IsNullOrWhiteSpace(Title) ? FirstUserMessage : Title;
+    internal string FileState => RolloutExists ? "文件正常" : "文件缺失";
+}
+
+internal sealed record ConversationExportResult(
+    int RequestedCount,
+    int ExportedCount,
+    int SkippedMissingFileCount,
+    string OutputPath)
+{
+    internal string ToDisplayString() => $"已导出 {ExportedCount} 条对话到：{OutputPath}" +
+        (SkippedMissingFileCount > 0 ? $"\n跳过 {SkippedMissingFileCount} 条缺失会话文件的记录。" : string.Empty);
+}
+
+internal sealed record ConversationImportResult(
+    int ImportedCount,
+    int SkippedExistingCount,
+    string PackagePath)
+{
+    internal string ToDisplayString() => $"已从对话包导入 {ImportedCount} 条对话。" +
+        (SkippedExistingCount > 0 ? $"\n跳过 {SkippedExistingCount} 条已存在的对话。" : string.Empty);
+}
+
+internal sealed record ConversationDeleteResult(
+    int RequestedCount,
+    int DeletedDatabaseRows,
+    int DeletedFiles,
+    int RemovedIndexEntries)
+{
+    internal string ToDisplayString() => $"已删除 {DeletedDatabaseRows} 条对话索引，删除 {DeletedFiles} 个会话文件，移除 {RemovedIndexEntries} 条 session_index 记录。";
+}
+
+internal sealed class ConversationPackageManifest
+{
+    public int Version { get; set; } = 1;
+    public string CreatedAt { get; set; } = string.Empty;
+    public string SourcePlatform { get; set; } = string.Empty;
+    public List<ConversationPackageEntry> Conversations { get; set; } = new();
+}
+
+internal sealed class ConversationPackageEntry
+{
+    public string Id { get; set; } = string.Empty;
+    public string Title { get; set; } = string.Empty;
+    public string FirstUserMessage { get; set; } = string.Empty;
+    public string Preview { get; set; } = string.Empty;
+    public string Model { get; set; } = string.Empty;
+    public string ModelProvider { get; set; } = string.Empty;
+    public string Source { get; set; } = string.Empty;
+    public string OriginalRolloutPath { get; set; } = string.Empty;
+    public string PackagePath { get; set; } = string.Empty;
+    public long UpdatedAt { get; set; }
+    public long UpdatedAtMs { get; set; }
+    public Dictionary<string, string?> ThreadValues { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+}
+
 internal sealed record LaunchTarget(
     string DisplayName,
     string FileName,

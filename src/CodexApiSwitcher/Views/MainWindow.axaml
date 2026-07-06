@@ -68,7 +68,8 @@
 
     <Button x:Name="ArmorButton" Classes="primaryBlue" Canvas.Left="30" Canvas.Top="604" Width="145" Height="42" Content="一键破甲" />
     <Button x:Name="RestoreArmorButton" Canvas.Left="190" Canvas.Top="604" Width="145" Height="42" Content="一键还原" />
-    <TextBlock x:Name="ArmorStateText" Canvas.Left="350" Canvas.Top="600" Width="310" Height="52" Foreground="#586376" TextWrapping="Wrap" />
+    <Button x:Name="HistoryManagerButton" Classes="teal" Canvas.Left="350" Canvas.Top="604" Width="145" Height="42" Content="对话历史管理" />
+    <TextBlock x:Name="ArmorStateText" Canvas.Left="510" Canvas.Top="600" Width="150" Height="52" Foreground="#586376" TextWrapping="Wrap" />
 
     <TextBlock Classes="label" Canvas.Left="30" Canvas.Top="666" Width="90" Height="27" Text="打开快捷键" />
     <TextBox x:Name="HotkeyBox" Canvas.Left="130" Canvas.Top="666" Width="165" Height="27" IsReadOnly="True"

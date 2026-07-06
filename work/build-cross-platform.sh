@@ -61,8 +61,8 @@ osx-*)
   <key>CFBundleIdentifier</key><string>com.codex-api-switcher.desktop</string>
   <key>CFBundleExecutable</key><string>CodexApiSwitcher</string>
   <key>CFBundlePackageType</key><string>APPL</string>
-  <key>CFBundleShortVersionString</key><string>2.1.0</string>
-  <key>CFBundleVersion</key><string>2.1.0</string>
+  <key>CFBundleShortVersionString</key><string>2.2.0</string>
+  <key>CFBundleVersion</key><string>2.2.0</string>
   <key>CFBundleIconFile</key><string>cas-logo.icns</string>
   <key>CFBundleDevelopmentRegion</key><string>zh_CN</string>
   <key>LSApplicationCategoryType</key><string>public.app-category.developer-tools</string>

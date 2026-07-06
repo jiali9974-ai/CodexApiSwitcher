@@ -11,7 +11,7 @@ internal sealed class DialogWindow : Window
     private bool result;
     internal static bool AutoAcceptDialogs { get; set; }
 
-    private DialogWindow(string title, string message, bool confirmation)
+    private DialogWindow(string title, string message, bool confirmation, string acceptText = "")
     {
         Title = title;
         Width = 500;
@@ -40,7 +40,7 @@ internal sealed class DialogWindow : Window
             var cancel = CreateButton("取消", false);
             buttons.Children.Add(cancel);
         }
-        buttons.Children.Add(CreateButton(confirmation ? "继续" : "确定", true));
+        buttons.Children.Add(CreateButton(acceptText.Length > 0 ? acceptText : confirmation ? "继续" : "确定", true));
         Content = new StackPanel
         {
             Margin = new Thickness(24),
@@ -56,10 +56,13 @@ internal sealed class DialogWindow : Window
         await dialog.ShowDialog(owner);
     }
 
-    internal static async Task<bool> ConfirmAsync(Window owner, string title, string message)
+    internal static async Task<bool> ConfirmAsync(Window owner, string title, string message) =>
+        await ConfirmAsync(owner, title, message, string.Empty);
+
+    internal static async Task<bool> ConfirmAsync(Window owner, string title, string message, string acceptText)
     {
         if (AutoAcceptDialogs) return true;
-        var dialog = new DialogWindow(title, message, true);
+        var dialog = new DialogWindow(title, message, true, acceptText);
         await dialog.ShowDialog(owner);
         return dialog.result;
     }

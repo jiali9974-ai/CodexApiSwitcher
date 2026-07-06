@@ -6,11 +6,11 @@ Codex API Switcher（CAS）用来在 Codex 的官方 OpenAI 登录和第三方 O
 
 请到 GitHub Releases 下载对应系统版本：
 
-- macOS Apple Silicon / M 系列：[CodexApiSwitcher-macos-arm64.zip](https://github.com/jiali9974-ai/CodexApiSwitcher/releases/download/v2.1.0/CodexApiSwitcher-macos-arm64.zip)
-- macOS Intel：[CodexApiSwitcher-macos-x64.zip](https://github.com/jiali9974-ai/CodexApiSwitcher/releases/download/v2.1.0/CodexApiSwitcher-macos-x64.zip)
-- Release 页面：[v2.1.0](https://github.com/jiali9974-ai/CodexApiSwitcher/releases/tag/v2.1.0)
+- macOS Apple Silicon / M 系列：[CodexApiSwitcher-macos-arm64.zip](https://github.com/jiali9974-ai/CodexApiSwitcher/releases/download/v2.2.0/CodexApiSwitcher-macos-arm64.zip)
+- macOS Intel：[CodexApiSwitcher-macos-x64.zip](https://github.com/jiali9974-ai/CodexApiSwitcher/releases/download/v2.2.0/CodexApiSwitcher-macos-x64.zip)
+- Release 页面：[v2.2.0](https://github.com/jiali9974-ai/CodexApiSwitcher/releases/tag/v2.2.0)
 
-- Windows：[CodexApiSwitcher-win-x64.exe](https://github.com/jiali9974-ai/CodexApiSwitcher/releases/download/v2.1.0/CodexApiSwitcher-win-x64.exe)
+- Windows：[CodexApiSwitcher-win-x64.exe](https://github.com/jiali9974-ai/CodexApiSwitcher/releases/download/v2.2.0/CodexApiSwitcher-win-x64.exe)
 
 Linux 版本可以从源码构建，或使用本地构建产物发布到 Releases。
 
@@ -50,7 +50,7 @@ xattr -dr com.apple.quarantine ./CodexApiSwitcher-macos-x64.app
 
 ## Windows 怎么打开
 
-1. 从 Release 下载 [CodexApiSwitcher-win-x64.exe](https://github.com/jiali9974-ai/CodexApiSwitcher/releases/download/v2.1.0/CodexApiSwitcher-win-x64.exe)。
+1. 从 Release 下载 [CodexApiSwitcher-win-x64.exe](https://github.com/jiali9974-ai/CodexApiSwitcher/releases/download/v2.2.0/CodexApiSwitcher-win-x64.exe)。
 2. 双击 `CodexApiSwitcher-win-x64.exe`，可以直接从“下载”或“桌面”运行。
 3. 如果 Windows SmartScreen 或安全软件提示，请确认文件来源是本仓库 Release，再选择“更多信息”→“仍要运行”。
 4. 打开后选择包含 `config.toml` 的 Codex 根目录。
@@ -166,6 +166,29 @@ CAS 会自动检测 `127.0.0.1` 上的常见代理端口，例如 `1082`、`7890
 - `NO_PROXY`
 
 如果 `.env` 已存在，CAS 会先备份到 `config-switcher-backups`。修复后请完全退出并重新打开 Codex。
+
+## 对话历史管理和跨电脑迁移
+
+CAS 提供独立的“对话历史管理”窗口：
+
+1. 在主界面点击“对话历史管理”。
+2. 用搜索框按标题或首条消息查询历史。
+3. 勾选需要操作的对话。
+4. 可执行：
+   - “导出选中”：生成 `.casconv.zip` 对话包，可拷贝到另一台电脑。
+   - “导入对话包”：把另一台电脑导出的对话合并到当前 Codex 历史。
+   - “删除选中”：永久删除选中对话的索引和 JSONL 文件。删除前会二次确认，不会创建备份，也不能在 CAS 中恢复。
+
+迁移包只包含对话 JSONL 和必要索引信息，不包含 `auth.json`、API Key、`config.toml`、插件、MCP、记忆文件或破甲文件。Windows 和 macOS 之间导入时，CAS 会自动把会话路径改成目标电脑的路径。导入和删除前请彻底退出 Codex。
+
+命令行也支持：
+
+```sh
+CodexApiSwitcher --list-conversations --query 关键词
+CodexApiSwitcher --export-conversations --ids id1,id2 --output conversations.casconv.zip
+CodexApiSwitcher --import-conversations --input conversations.casconv.zip
+CodexApiSwitcher --delete-conversations --ids id1,id2
+```
 
 ## 会话列表不见了怎么办
 
