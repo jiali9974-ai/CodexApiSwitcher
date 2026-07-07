@@ -6,8 +6,8 @@ Codex API Switcher（CAS）用来在 Codex 的官方 OpenAI 登录和第三方 O
 
 请到 GitHub Releases 下载对应系统版本：
 
-- macOS Apple Silicon / M 系列：[CodexApiSwitcher-macos-arm64.zip](https://github.com/jiali9974-ai/CodexApiSwitcher/releases/download/v2.2.0/CodexApiSwitcher-macos-arm64.zip)
-- macOS Intel：[CodexApiSwitcher-macos-x64.zip](https://github.com/jiali9974-ai/CodexApiSwitcher/releases/download/v2.2.0/CodexApiSwitcher-macos-x64.zip)
+- macOS Apple Silicon / M 系列：[CodexApiSwitcher-macos-arm64.dmg](https://github.com/jiali9974-ai/CodexApiSwitcher/releases/download/v2.2.0/CodexApiSwitcher-macos-arm64.dmg)
+- macOS Intel：[CodexApiSwitcher-macos-x64.dmg](https://github.com/jiali9974-ai/CodexApiSwitcher/releases/download/v2.2.0/CodexApiSwitcher-macos-x64.dmg)
 - Release 页面：[v2.2.0](https://github.com/jiali9974-ai/CodexApiSwitcher/releases/tag/v2.2.0)
 
 - Windows：[CodexApiSwitcher-win-x64.exe](https://github.com/jiali9974-ai/CodexApiSwitcher/releases/download/v2.2.0/CodexApiSwitcher-win-x64.exe)
@@ -16,11 +16,11 @@ Linux 版本可以从源码构建，或使用本地构建产物发布到 Release
 
 ## macOS 怎么打开
 
-1. 下载与你电脑架构对应的 zip。
+1. 下载与你电脑架构对应的 DMG。
    - M 系列芯片选 arm64。
    - Intel Mac 选 x64。
-2. 在 macOS 上解压 zip。
-3. 双击解压出来的 `.app`。
+2. 双击打开 DMG。
+3. 将 `Codex API Switcher.app` 拖到“应用程序”，或直接在 DMG 窗口中双击运行。
 4. 如果系统提示“无法验证开发者”：
    - 打开“系统设置”。
    - 进入“隐私与安全性”。
@@ -39,9 +39,7 @@ tail -n 80 ~/Library/Logs/CodexApiSwitcher.log
 如需手动放行隔离属性：
 
 ```sh
-xattr -dr com.apple.quarantine ./CodexApiSwitcher-macos-arm64.app
-# 或
-xattr -dr com.apple.quarantine ./CodexApiSwitcher-macos-x64.app
+xattr -dr com.apple.quarantine "/Applications/Codex API Switcher.app"
 ```
 
 当前发布包使用 ad-hoc 签名，不是 Apple Developer ID 公证包，所以首次运行可能仍需要手动允许。
@@ -167,19 +165,32 @@ CAS 会自动检测 `127.0.0.1` 上的常见代理端口，例如 `1082`、`7890
 
 如果 `.env` 已存在，CAS 会先备份到 `config-switcher-backups`。修复后请完全退出并重新打开 Codex。
 
-## 对话历史管理和跨电脑迁移
+## 迁移管理：对话历史和 Skills
 
-CAS 提供独立的“对话历史管理”窗口：
+CAS 提供独立的“对话历史管理 / 迁移管理”窗口，里面有两个同等级功能页：
 
-1. 在主界面点击“对话历史管理”。
-2. 用搜索框按标题或首条消息查询历史。
+### 对话历史
+
+1. 在主界面点击“迁移管理”。
+2. 切到“对话历史”页，用搜索框按标题或首条消息查询历史。
 3. 勾选需要操作的对话。
 4. 可执行：
    - “导出选中”：生成 `.casconv.zip` 对话包，可拷贝到另一台电脑。
    - “导入对话包”：把另一台电脑导出的对话合并到当前 Codex 历史。
    - “删除选中”：永久删除选中对话的索引和 JSONL 文件。删除前会二次确认，不会创建备份，也不能在 CAS 中恢复。
 
-迁移包只包含对话 JSONL 和必要索引信息，不包含 `auth.json`、API Key、`config.toml`、插件、MCP、记忆文件或破甲文件。Windows 和 macOS 之间导入时，CAS 会自动把会话路径改成目标电脑的路径。导入和删除前请彻底退出 Codex。
+对话迁移包只包含对话 JSONL 和必要索引信息，不包含 `auth.json`、API Key、`config.toml`、插件、MCP、记忆文件或破甲文件。Windows 和 macOS 之间导入时，CAS 会自动把会话路径改成目标电脑的路径。导入和删除前请彻底退出 Codex。
+
+### Skills
+
+1. 切到“Skills”页，用搜索框按 Skill 名称、说明或路径查询。
+2. 勾选需要操作的 Skill。
+3. 可执行：
+   - “导出选中”：生成 `.casskills.zip` Skill 包，可拷贝到另一台电脑。
+   - “导入 Skill 包”：把另一台电脑导出的 Skill 合并到当前 Codex `skills` 目录。
+   - “删除选中”：永久删除选中的用户 Skill。删除前会二次确认，不会创建备份，也不能在 CAS 中恢复。
+
+系统内置 `.system` Skills 会显示为只读，用于识别当前环境；不会被导出，也不能删除。导入时如果目标电脑已有同名 Skill，会跳过，不覆盖目标已有内容。
 
 命令行也支持：
 
@@ -188,6 +199,11 @@ CodexApiSwitcher --list-conversations --query 关键词
 CodexApiSwitcher --export-conversations --ids id1,id2 --output conversations.casconv.zip
 CodexApiSwitcher --import-conversations --input conversations.casconv.zip
 CodexApiSwitcher --delete-conversations --ids id1,id2
+
+CodexApiSwitcher --list-skills --query 关键词
+CodexApiSwitcher --export-skills --ids skill-a,skill-b --output skills.casskills.zip
+CodexApiSwitcher --import-skills --input skills.casskills.zip
+CodexApiSwitcher --delete-skills --ids skill-a,skill-b
 ```
 
 ## 会话列表不见了怎么办
@@ -221,8 +237,10 @@ CAS 已集成 `Codex-5.5-codex-instruct-5.5` 的 GPT-5.5 指令注入方式：
 
 ## 启动和关闭 Codex
 
-CAS 提供两个按钮：
+CAS 把高频按钮放在主界面第一栏“常用切换”：
 
+- “切换到第三方 API”
+- “切换到官方登录”
 - “启动 Codex”：尝试打开 Codex 桌面应用或 `codex` 命令。
 - “关闭 Codex 后台”：结束 Codex 相关后台进程，方便你切换配置。
 
@@ -244,6 +262,8 @@ CAS 会自动备份关键文件：
 - `history_sync_backups`：状态库和会话元数据备份
 
 备份目录位于你选择的 Codex 根目录下。
+
+“恢复最近备份”已放在“修复与工具”栏。该栏还提供“清理 CAS 备份”：只删除 `config-switcher-backups` 和 `history_sync_backups`，不会删除 `auth.json`、API Key、档案、Skills、对话包或当前配置。清理前会二次确认；清理后无法再通过“恢复最近备份”恢复这些旧备份。
 
 ## CAS 不会修改什么
 
@@ -298,13 +318,13 @@ powershell -NoProfile -ExecutionPolicy Bypass -File work\test-cross-platform.ps1
 
 ### 新 Mac 需要先安装什么环境？
 
-普通用户不需要安装任何开发环境。macOS 版下载 zip、解压、双击 `.app` 即可。它不依赖 Homebrew、.NET、Python、Xcode 或命令行工具。
+普通用户不需要安装任何开发环境。macOS 版下载 DMG、打开后拖入“应用程序”或直接双击 `.app` 即可。它不依赖 Homebrew、.NET、Python、Xcode 或命令行工具。
 
 如果你要自己从源码构建，才需要安装 .NET 10 SDK。
 
 ### 为什么 Git 仓库里没有直接放 .app？
 
-macOS `.app` 内部的自包含主程序、Windows 自包含 exe 都接近或超过 GitHub 普通 Git 单文件 100 MB 限制，所以不放进 Git 历史。请从 GitHub Releases 下载发布包。macOS zip 解压后就是 `.app`，Windows 直接下载 exe。
+macOS `.app` 内部的自包含主程序、Windows 自包含 exe 都接近或超过 GitHub 普通 Git 单文件 100 MB 限制，所以不放进 Git 历史。请从 GitHub Releases 下载发布包。macOS DMG 内含 `.app` 和“应用程序”快捷入口，Windows 直接下载 exe。
 
 ### 为什么 macOS 首次运行要手动允许？
 

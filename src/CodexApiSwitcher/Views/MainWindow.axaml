@@ -3,87 +3,170 @@
         x:Class="CodexApiSwitcher.Views.MainWindow"
         x:Name="MainWindowRoot"
         Title="CAS - Codex API 切换器"
-        Width="690" Height="884"
-        MinWidth="690" MinHeight="884"
+        Width="760" Height="900"
+        MinWidth="740" MinHeight="720"
         WindowStartupLocation="CenterScreen"
         Icon="/Assets/cas-logo.ico"
-        Background="#F7F9FC">
-  <Canvas Width="690" Height="884" Background="#F7F9FC">
-    <TextBlock Canvas.Left="28" Canvas.Top="20" Text="CAS · Codex API 切换器"
-               FontSize="24" FontWeight="Bold" />
+        Background="#F4F7FB">
+  <Grid>
+    <Canvas IsHitTestVisible="False">
+      <Ellipse Canvas.Left="-120" Canvas.Top="-110" Width="320" Height="320" Fill="#BBD7FF" Opacity="0.55" />
+      <Ellipse Canvas.Left="560" Canvas.Top="40" Width="220" Height="220" Fill="#BDF4EA" Opacity="0.42" />
+      <Ellipse Canvas.Left="430" Canvas.Top="690" Width="260" Height="260" Fill="#FFE5B8" Opacity="0.32" />
+    </Canvas>
 
-    <Border Canvas.Left="30" Canvas.Top="64" Width="630" Height="38"
-            Background="#ECFDF3" BorderBrush="#86B995" BorderThickness="1">
-      <TextBlock Margin="8,0" VerticalAlignment="Center" Foreground="#15803D"
-                 Text="切换前请先彻底退出 Codex。工具会自动备份配置和历史库，不会修改会话正文、记忆文件或 auth.json。" />
-    </Border>
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+      <StackPanel Margin="28" Spacing="16">
+        <Grid ColumnDefinitions="*,Auto" Margin="0,2,0,0">
+          <StackPanel Spacing="4">
+            <TextBlock Text="CAS · Codex API 切换器" FontSize="28" FontWeight="Bold" Foreground="#111827" />
+            <TextBlock Classes="hint" Text="切换官方登录、第三方 API、破甲与对话迁移，一处完成。" />
+          </StackPanel>
+          <Border Grid.Column="1" Classes="statusPill" Padding="12,8" VerticalAlignment="Center">
+            <TextBlock Text="v2.2.0" FontWeight="Bold" Foreground="#2F6BFF" />
+          </Border>
+        </Grid>
 
-    <TextBlock Classes="label" Canvas.Left="30" Canvas.Top="117" Width="125" Height="27" Text="Codex 根目录" />
-    <TextBox x:Name="RootBox" Canvas.Left="160" Canvas.Top="117" Width="405" Height="27"
-             AutomationProperties.Name="Codex 根目录" ToolTip.Tip="选择包含 config.toml 的 Codex 根目录。" />
-    <Button x:Name="BrowseButton" Canvas.Left="575" Canvas.Top="116" Width="85" Height="30" Content="选择..."
-            AutomationProperties.Name="选择 Codex 根目录" />
+        <Border Classes="infoPill">
+          <TextBlock Foreground="#2457D6" TextWrapping="Wrap" LineHeight="20"
+                     Text="切换前请先彻底退出 Codex。CAS 会自动备份配置和历史库，不会修改会话正文、记忆文件或 auth.json。" />
+        </Border>
 
-    <Border x:Name="StatusBorder" Canvas.Left="30" Canvas.Top="158" Width="630" Height="38"
-            Background="White" BorderBrush="#CAD5E2" BorderThickness="1">
-      <TextBlock x:Name="StatusText" Margin="8,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
-    </Border>
+        <Border x:Name="StatusBorder" Classes="statusPill">
+          <TextBlock x:Name="StatusText" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
+        </Border>
 
-    <TextBlock Classes="label" Canvas.Left="30" Canvas.Top="205" Width="125" Height="27" Text="中转站档案" />
-    <ComboBox x:Name="ProfileBox" Canvas.Left="160" Canvas.Top="205" Width="270" Height="27"
-              AutomationProperties.Name="中转站档案" />
-    <Button x:Name="SaveProfileButton" Canvas.Left="445" Canvas.Top="202" Width="95" Height="32" Content="保存档案" />
-    <Button x:Name="DeleteProfileButton" Canvas.Left="555" Canvas.Top="202" Width="105" Height="32" Content="删除档案" />
+        <Border Classes="glassCard">
+          <StackPanel Spacing="16">
+            <StackPanel Spacing="4">
+              <TextBlock Classes="sectionTitle" Text="1. 常用切换" />
+              <TextBlock Classes="sectionNote" Text="高频操作放在最前面：先切换 API，再按需启动或关闭 Codex。完成切换后请重新打开 Codex。" />
+            </StackPanel>
+            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="12">
+              <Button x:Name="ThirdPartyButton" Grid.Row="0" Grid.Column="0" Classes="primaryBlue" Height="46" Content="切换到第三方 API" />
+              <Button x:Name="OfficialButton" Grid.Row="0" Grid.Column="1" Classes="primaryDark" Height="46" Content="切换到官方登录" />
+              <Button x:Name="LaunchCodexButton" Grid.Row="1" Grid.Column="0" Classes="teal" Height="42" Content="启动 Codex" />
+              <Button x:Name="CloseCodexButton" Grid.Row="1" Grid.Column="1" Classes="danger" Height="42" Content="关闭 Codex 后台" />
+            </Grid>
+          </StackPanel>
+        </Border>
 
-    <TextBlock Classes="label" Canvas.Left="30" Canvas.Top="245" Width="125" Height="27" Text="第三方 Base URL" />
-    <TextBox x:Name="UrlBox" Canvas.Left="160" Canvas.Top="245" Width="500" Height="27"
-             AutomationProperties.Name="第三方 Base URL" ToolTip.Tip="第三方 API 地址，工具会自动规范为 /v1。" />
+        <Border Classes="glassCard">
+          <StackPanel Spacing="14">
+            <StackPanel Spacing="4">
+              <TextBlock Classes="sectionTitle" Text="2. 选择 Codex 根目录" />
+              <TextBlock Classes="sectionNote" Text="选择包含 config.toml 的 Codex 根目录，后续所有操作都会作用在这里。" />
+            </StackPanel>
+            <Grid ColumnDefinitions="128,*,96" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="10">
+              <TextBlock Grid.Row="0" Grid.Column="0" Classes="label" Text="Codex 根目录" />
+              <TextBox x:Name="RootBox" Grid.Row="0" Grid.Column="1"
+                       AutomationProperties.Name="Codex 根目录" ToolTip.Tip="选择包含 config.toml 的 Codex 根目录。" />
+              <Button x:Name="BrowseButton" Grid.Row="0" Grid.Column="2" Content="选择..."
+                      AutomationProperties.Name="选择 Codex 根目录" />
+              <TextBlock x:Name="BackupLocationText" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
+                         Foreground="#667085" TextTrimming="CharacterEllipsis" />
+            </Grid>
+          </StackPanel>
+        </Border>
 
-    <TextBlock Classes="label" Canvas.Left="30" Canvas.Top="285" Width="125" Height="27" Text="第三方模型" />
-    <TextBox x:Name="ThirdPartyModelBox" Canvas.Left="160" Canvas.Top="285" Width="210" Height="27" AutomationProperties.Name="第三方模型" />
-    <TextBlock Classes="label" Canvas.Left="390" Canvas.Top="285" Width="75" Height="27" Text="官方模型" />
-    <TextBox x:Name="OfficialModelBox" Canvas.Left="475" Canvas.Top="285" Width="185" Height="27" AutomationProperties.Name="官方模型" />
+        <Border Classes="glassCard">
+          <StackPanel Spacing="16">
+            <StackPanel Spacing="4">
+              <TextBlock Classes="sectionTitle" Text="3. API 与档案" />
+              <TextBlock Classes="sectionNote" Text="保存常用第三方中转站档案，切换时可以直接选择。API Key 只保存在当前系统的凭据存储中。" />
+            </StackPanel>
 
-    <TextBlock Classes="label" Canvas.Left="30" Canvas.Top="325" Width="125" Height="27" Text="第三方 API Key" />
-    <TextBox x:Name="KeyBox" Canvas.Left="160" Canvas.Top="325" Width="410" Height="27" PasswordChar="●"
-             AutomationProperties.Name="第三方 API Key" ToolTip.Tip="API Key 只会加密保存在当前用户的系统凭据存储中。" />
-    <CheckBox x:Name="ShowKeyCheckBox" Canvas.Left="580" Canvas.Top="327" Width="70" Height="24" Content="显示" />
-    <TextBlock x:Name="KeyStateText" Canvas.Left="160" Canvas.Top="356" Width="500" Height="20" Foreground="#586376" />
+            <Grid ColumnDefinitions="128,*,104,104" RowDefinitions="Auto,12,Auto,12,Auto,8,Auto,Auto,12,Auto" ColumnSpacing="10">
+              <TextBlock Grid.Row="0" Grid.Column="0" Classes="label" Text="中转站档案" />
+              <ComboBox x:Name="ProfileBox" Grid.Row="0" Grid.Column="1" AutomationProperties.Name="中转站档案" />
+              <Button x:Name="SaveProfileButton" Grid.Row="0" Grid.Column="2" Content="保存档案" />
+              <Button x:Name="DeleteProfileButton" Grid.Row="0" Grid.Column="3" Content="删除档案" Classes="ghost" />
 
-    <CheckBox x:Name="CompatibilityCheckBox" Canvas.Left="30" Canvas.Top="378" Width="95" Height="24" Content="兼容模式" />
-    <TextBlock Canvas.Left="130" Canvas.Top="374" Width="530" Height="34" Foreground="#586376" TextWrapping="Wrap"
-               Text="遇到 Image generation 403 时开启；切第三方会收起高级工具，切回官方自动恢复。" />
+              <TextBlock Grid.Row="2" Grid.Column="0" Classes="label" Text="第三方 Base URL" />
+              <TextBox x:Name="UrlBox" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3"
+                       AutomationProperties.Name="第三方 Base URL" ToolTip.Tip="第三方 API 地址，工具会自动规范为 /v1。" />
 
-    <Button x:Name="ThirdPartyButton" Classes="primaryBlue" Canvas.Left="30" Canvas.Top="418" Width="195" Height="46" Content="切换到第三方 API" />
-    <Button x:Name="OfficialButton" Classes="primaryDark" Canvas.Left="245" Canvas.Top="418" Width="195" Height="46" Content="切换到官方登录" />
-    <Button x:Name="RollbackButton" Canvas.Left="460" Canvas.Top="418" Width="200" Height="46" Content="恢复最近备份" />
+              <TextBlock Grid.Row="4" Grid.Column="0" Classes="label" Text="模型" />
+              <Grid Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3" ColumnDefinitions="*,94,*" ColumnSpacing="10">
+                <TextBox x:Name="ThirdPartyModelBox" Grid.Column="0" AutomationProperties.Name="第三方模型" PlaceholderText="第三方模型" />
+                <TextBlock Grid.Column="1" Classes="label" Text="官方模型" HorizontalAlignment="Center" />
+                <TextBox x:Name="OfficialModelBox" Grid.Column="2" AutomationProperties.Name="官方模型" PlaceholderText="官方模型" />
+              </Grid>
 
-    <Button x:Name="RepairButton" Canvas.Left="30" Canvas.Top="484" Width="145" Height="42" Content="修复会话列表" />
-    <Button x:Name="ResetConfigButton" Canvas.Left="190" Canvas.Top="484" Width="145" Height="42" Content="恢复基础配置" />
-    <Button x:Name="RepairReconnectingButton" Classes="teal" Canvas.Left="350" Canvas.Top="484" Width="145" Height="42" Content="修复 Reconnecting" />
-    <Button x:Name="CloseCodexButton" Classes="danger" Canvas.Left="510" Canvas.Top="484" Width="150" Height="42" Content="关闭 Codex 后台" />
-    <Button x:Name="LaunchCodexButton" Classes="teal" Canvas.Left="30" Canvas.Top="538" Width="145" Height="42" Content="启动 Codex" />
-    <TextBlock Canvas.Left="190" Canvas.Top="535" Width="470" Height="48" Foreground="#92400E" TextWrapping="Wrap"
-               Text="Reconnecting 频繁出现时，先打开本地代理，再点修复；CAS 会检测 127.0.0.1 常见代理端口并写入 Codex .env。" />
+              <TextBlock Grid.Row="6" Grid.Column="0" Classes="label" Text="第三方 API Key" />
+              <Grid Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="3" ColumnDefinitions="*,76" ColumnSpacing="10">
+                <TextBox x:Name="KeyBox" Grid.Column="0" PasswordChar="●"
+                         AutomationProperties.Name="第三方 API Key" ToolTip.Tip="API Key 只会加密保存在当前用户的系统凭据存储中。" />
+                <CheckBox x:Name="ShowKeyCheckBox" Grid.Column="1" Content="显示" VerticalAlignment="Center" />
+              </Grid>
+              <TextBlock x:Name="KeyStateText" Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="3" Foreground="#667085" />
 
-    <Button x:Name="ArmorButton" Classes="primaryBlue" Canvas.Left="30" Canvas.Top="604" Width="145" Height="42" Content="一键破甲" />
-    <Button x:Name="RestoreArmorButton" Canvas.Left="190" Canvas.Top="604" Width="145" Height="42" Content="一键还原" />
-    <Button x:Name="HistoryManagerButton" Classes="teal" Canvas.Left="350" Canvas.Top="604" Width="145" Height="42" Content="对话历史管理" />
-    <TextBlock x:Name="ArmorStateText" Canvas.Left="510" Canvas.Top="600" Width="150" Height="52" Foreground="#586376" TextWrapping="Wrap" />
+              <CheckBox x:Name="CompatibilityCheckBox" Grid.Row="9" Grid.Column="0" Content="兼容模式" />
+              <TextBlock Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="3" Classes="sectionNote"
+                         Text="遇到 Image generation 403 时开启；切第三方会收起高级工具，切回官方自动恢复。" />
+            </Grid>
+          </StackPanel>
+        </Border>
 
-    <TextBlock Classes="label" Canvas.Left="30" Canvas.Top="666" Width="90" Height="27" Text="打开快捷键" />
-    <TextBox x:Name="HotkeyBox" Canvas.Left="130" Canvas.Top="666" Width="165" Height="27" IsReadOnly="True"
-             AutomationProperties.Name="打开界面快捷键" />
-    <Button x:Name="HotkeyButton" Canvas.Left="310" Canvas.Top="663" Width="145" Height="32" Content="设置快捷键" />
-    <TextBlock Classes="label" Canvas.Left="475" Canvas.Top="666" Width="75" Height="27" Text="鼠标侧键" />
-    <ComboBox x:Name="MouseButtonBox" Canvas.Left="555" Canvas.Top="666" Width="105" Height="27" AutomationProperties.Name="鼠标侧键" />
+        <Border Classes="glassCard">
+          <StackPanel Spacing="16">
+            <StackPanel Spacing="4">
+              <TextBlock Classes="sectionTitle" Text="4. 修复与工具" />
+              <TextBlock Classes="sectionNote" Text="会话列表、基础配置、Reconnecting、恢复备份和清理 CAS 备份都在这里处理。" />
+            </StackPanel>
+            <Grid ColumnDefinitions="*,*,*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="12">
+              <Button x:Name="RepairButton" Grid.Row="0" Grid.Column="0" Content="修复会话列表" />
+              <Button x:Name="ResetConfigButton" Grid.Row="0" Grid.Column="1" Content="恢复基础配置" />
+              <Button x:Name="RepairReconnectingButton" Grid.Row="0" Grid.Column="2" Classes="teal" Content="修复 Reconnecting" />
+              <Button x:Name="RollbackButton" Grid.Row="0" Grid.Column="3" Content="恢复最近备份" />
+              <Button x:Name="CleanBackupsButton" Grid.Row="1" Grid.Column="0" Classes="danger" Content="清理 CAS 备份" />
+              <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Classes="sectionNote"
+                         Text="Reconnecting 频繁出现时，先打开本地代理，再点修复；CAS 会检测 127.0.0.1 常见代理端口并写入 Codex .env。" />
+              <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Classes="sectionNote"
+                         Text="清理 CAS 备份只删除 config-switcher-backups 和 history_sync_backups，不删除 auth.json、API Key、档案、Skills 或对话包。" />
+            </Grid>
+          </StackPanel>
+        </Border>
 
-    <CheckBox x:Name="StartupCheckBox" Canvas.Left="30" Canvas.Top="708" Width="115" Height="24" Content="开机启动" />
-    <TextBlock x:Name="FooterText" Canvas.Left="155" Canvas.Top="706" Width="505" Height="45" Foreground="#586376" TextWrapping="Wrap"
-               Text="切换完成后请重新打开 Codex。快捷键和鼠标侧键都支持打开/收回后台。开机启动会直接驻留托盘。" />
+        <Border Classes="glassCard">
+          <StackPanel Spacing="16">
+            <StackPanel Spacing="4">
+              <TextBlock Classes="sectionTitle" Text="5. 破甲与迁移管理" />
+              <TextBlock Classes="sectionNote" Text="破甲、还原和跨电脑迁移集中放在一起；删除对话前会二次确认。" />
+            </StackPanel>
+            <Grid ColumnDefinitions="*,*,*,1.2*" ColumnSpacing="12">
+              <Button x:Name="ArmorButton" Grid.Column="0" Classes="warning" Height="46" Content="一键破甲" />
+              <Button x:Name="RestoreArmorButton" Grid.Column="1" Height="46" Content="一键还原" />
+              <Button x:Name="HistoryManagerButton" Grid.Column="2" Classes="teal" Height="46" Content="迁移管理" />
+              <Border Grid.Column="3" Classes="statusPill" Padding="12,8">
+                <TextBlock x:Name="ArmorStateText" Foreground="#667085" TextWrapping="Wrap" />
+              </Border>
+            </Grid>
+          </StackPanel>
+        </Border>
 
-    <TextBlock x:Name="BackupLocationText" Canvas.Left="30" Canvas.Top="766" Width="630" Height="48" Foreground="#586376" TextTrimming="CharacterEllipsis" />
-    <TextBlock Canvas.Left="300" Canvas.Top="848" Width="360" Height="24" Foreground="#919191" TextAlignment="Right"
-               Text="github.com/yin-yizhen/codex-api-switcher" />
-  </Canvas>
+        <Border Classes="glassCard">
+          <StackPanel Spacing="14">
+            <StackPanel Spacing="4">
+              <TextBlock Classes="sectionTitle" Text="6. 后台与快捷唤出" />
+              <TextBlock Classes="sectionNote" Text="设置快捷键、鼠标侧键和开机启动，让 CAS 常驻后台时也能快速打开。" />
+            </StackPanel>
+            <Grid ColumnDefinitions="104,170,130,88,*" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="12">
+              <TextBlock Grid.Row="0" Grid.Column="0" Classes="label" Text="打开快捷键" />
+              <TextBox x:Name="HotkeyBox" Grid.Row="0" Grid.Column="1" IsReadOnly="True" AutomationProperties.Name="打开界面快捷键" />
+              <Button x:Name="HotkeyButton" Grid.Row="0" Grid.Column="2" Content="设置快捷键" />
+              <TextBlock Grid.Row="0" Grid.Column="3" Classes="label" Text="鼠标侧键" />
+              <ComboBox x:Name="MouseButtonBox" Grid.Row="0" Grid.Column="4" AutomationProperties.Name="鼠标侧键" />
+              <CheckBox x:Name="StartupCheckBox" Grid.Row="1" Grid.Column="0" Content="开机启动" />
+              <TextBlock x:Name="FooterText" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" Classes="sectionNote"
+                         Text="切换完成后请重新打开 Codex。快捷键和鼠标侧键都支持打开/收回后台。开机启动会直接驻留托盘。" />
+            </Grid>
+          </StackPanel>
+        </Border>
+
+        <TextBlock Foreground="#98A2B3" TextAlignment="Right" Margin="0,2,0,8"
+                   Text="github.com/yin-yizhen/codex-api-switcher" />
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
 </Window>

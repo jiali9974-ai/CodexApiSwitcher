@@ -372,3 +372,90 @@ internal sealed record LaunchTarget(
 
     private static string ShellQuote(string value) => "'" + value.Replace("'", "'\"'\"'") + "'";
 }
+
+internal sealed record SkillSummary(
+    string Id,
+    string Name,
+    string Description,
+    string RelativePath,
+    string FullPath,
+    string Source,
+    bool IsSystem,
+    bool Exists,
+    DateTimeOffset UpdatedAt,
+    long SizeBytes)
+{
+    internal string DisplayName => string.IsNullOrWhiteSpace(Name) ? Id : Name;
+    internal string FileState => Exists ? "文件正常" : "文件缺失";
+    internal string SizeText => SizeBytes <= 0 ? "-" : SizeBytes < 1024 ? SizeBytes + " B" : SizeBytes < 1024 * 1024 ? (SizeBytes / 1024d).ToString("0.#") + " KB" : (SizeBytes / 1024d / 1024d).ToString("0.#") + " MB";
+}
+
+internal sealed record SkillExportResult(
+    int RequestedCount,
+    int ExportedCount,
+    int SkippedSystemCount,
+    int SkippedMissingCount,
+    string OutputPath)
+{
+    internal string ToDisplayString() => $"已导出 {ExportedCount} 个 Skill 到：{OutputPath}" +
+        (SkippedSystemCount > 0 ? $"\n跳过 {SkippedSystemCount} 个系统内置 Skill。" : string.Empty) +
+        (SkippedMissingCount > 0 ? $"\n跳过 {SkippedMissingCount} 个缺失 Skill。" : string.Empty);
+}
+
+internal sealed record SkillImportResult(
+    int ImportedCount,
+    int SkippedExistingCount,
+    string PackagePath)
+{
+    internal string ToDisplayString() => $"已从 Skill 包导入 {ImportedCount} 个 Skill。" +
+        (SkippedExistingCount > 0 ? $"\n跳过 {SkippedExistingCount} 个目标电脑已存在的 Skill。" : string.Empty);
+}
+
+internal sealed record SkillDeleteResult(
+    int RequestedCount,
+    int DeletedCount,
+    int SkippedSystemCount,
+    int MissingCount)
+{
+    internal string ToDisplayString() => $"已删除 {DeletedCount} 个 Skill。" +
+        (SkippedSystemCount > 0 ? $"\n跳过 {SkippedSystemCount} 个系统内置 Skill。" : string.Empty) +
+        (MissingCount > 0 ? $"\n{MissingCount} 个 Skill 已不存在。" : string.Empty);
+}
+
+internal sealed record BackupCleanupResult(
+    int DeletedDirectories,
+    int DeletedFiles,
+    long ReclaimedBytes,
+    IReadOnlyList<string> DeletedPaths)
+{
+    internal string ToDisplayString()
+    {
+        var size = ReclaimedBytes < 1024
+            ? ReclaimedBytes + " B"
+            : ReclaimedBytes < 1024 * 1024
+                ? (ReclaimedBytes / 1024d).ToString("0.#") + " KB"
+                : (ReclaimedBytes / 1024d / 1024d).ToString("0.#") + " MB";
+        var paths = DeletedPaths.Count == 0 ? string.Empty : "\n已清理：" + string.Join("；", DeletedPaths);
+        return $"已清理 CAS 备份：删除 {DeletedDirectories} 个目录、{DeletedFiles} 个文件，释放约 {size}。" + paths;
+    }
+}
+
+internal sealed class SkillPackageManifest
+{
+    public int Version { get; set; } = 1;
+    public string CreatedAt { get; set; } = string.Empty;
+    public string SourcePlatform { get; set; } = string.Empty;
+    public List<SkillPackageEntry> Skills { get; set; } = new();
+}
+
+internal sealed class SkillPackageEntry
+{
+    public string Id { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public string RelativePath { get; set; } = string.Empty;
+    public string PackagePath { get; set; } = string.Empty;
+    public string Source { get; set; } = string.Empty;
+    public long UpdatedAtMs { get; set; }
+    public long SizeBytes { get; set; }
+}

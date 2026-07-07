@@ -114,7 +114,8 @@ internal static class Program
         "--save-profile" or "--delete-profile" or "--list-profiles" or "--switch-official" or
         "--rollback" or "--reset-config" or "--repair-sidebar" or "--repair-reconnecting" or "--detect-proxy" or "--armor-status" or
         "--enable-armor" or "--restore-armor" or "--list-conversations" or "--export-conversations" or
-        "--import-conversations" or "--delete-conversations" or "--codex-launch-plan" or
+        "--import-conversations" or "--delete-conversations" or "--list-skills" or "--export-skills" or
+        "--import-skills" or "--delete-skills" or "--clean-backups" or "--codex-launch-plan" or
         "--launch-codex" or "--close-codex" or "--normalize-hotkey" or "--save-hotkey" or
         "--show-hotkey" or "--normalize-mouse-button" or "--save-mouse-button" or
         "--show-mouse-button" or "--enable-startup" or "--disable-startup" or
@@ -195,6 +196,26 @@ internal static class Program
         else if (options.ContainsKey("--export-conversations")) Console.WriteLine(service.ExportConversations(ParseIdList(RequireOption(options, "--ids")), RequireOption(options, "--output")).ToDisplayString());
         else if (options.ContainsKey("--import-conversations")) Console.WriteLine(service.ImportConversations(RequireOption(options, "--input")).ToDisplayString());
         else if (options.ContainsKey("--delete-conversations")) Console.WriteLine(service.DeleteConversations(ParseIdList(RequireOption(options, "--ids"))).ToDisplayString());
+        else if (options.ContainsKey("--list-skills"))
+        {
+            foreach (var item in service.ListSkills(GetOption(options, "--query", string.Empty)))
+            {
+                Console.WriteLine(string.Join("|", new[]
+                {
+                    item.Id,
+                    item.DisplayName.Replace("|", " "),
+                    item.Description.Replace("|", " "),
+                    item.UpdatedAt == DateTimeOffset.MinValue ? string.Empty : item.UpdatedAt.ToString("O"),
+                    item.SizeText,
+                    item.Source,
+                    item.FileState
+                }));
+            }
+        }
+        else if (options.ContainsKey("--export-skills")) Console.WriteLine(service.ExportSkills(ParseIdList(RequireOption(options, "--ids")), RequireOption(options, "--output")).ToDisplayString());
+        else if (options.ContainsKey("--import-skills")) Console.WriteLine(service.ImportSkills(RequireOption(options, "--input")).ToDisplayString());
+        else if (options.ContainsKey("--delete-skills")) Console.WriteLine(service.DeleteSkills(ParseIdList(RequireOption(options, "--ids"))).ToDisplayString());
+        else if (options.ContainsKey("--clean-backups")) Console.WriteLine(service.CleanCasBackups().ToDisplayString());
         else if (options.ContainsKey("--codex-launch-plan")) Console.WriteLine(service.GetCodexLaunchPlan());
         else if (options.ContainsKey("--launch-codex")) Console.WriteLine(service.LaunchCodex());
         else if (options.ContainsKey("--close-codex")) Console.WriteLine(service.CloseCodexProcesses(options.ContainsKey("--dry-run")));

@@ -49,6 +49,7 @@ internal sealed partial class MainWindow : Window
     private readonly Button thirdPartyButton;
     private readonly Button officialButton;
     private readonly Button rollbackButton;
+    private readonly Button cleanBackupsButton;
     private readonly Button repairButton;
     private readonly Button resetConfigButton;
     private readonly Button repairReconnectingButton;
@@ -72,6 +73,7 @@ internal sealed partial class MainWindow : Window
     internal MainWindow(string initialRoot, bool renderSnapshot)
     {
         AvaloniaXamlLoader.Load(this);
+        TransparencyLevelHint = new[] { WindowTransparencyLevel.Mica, WindowTransparencyLevel.AcrylicBlur, WindowTransparencyLevel.Blur };
         snapshotMode = renderSnapshot;
         rootBox = Find<TextBox>("RootBox");
         profileBox = Find<ComboBox>("ProfileBox");
@@ -96,6 +98,7 @@ internal sealed partial class MainWindow : Window
         thirdPartyButton = Find<Button>("ThirdPartyButton");
         officialButton = Find<Button>("OfficialButton");
         rollbackButton = Find<Button>("RollbackButton");
+        cleanBackupsButton = Find<Button>("CleanBackupsButton");
         repairButton = Find<Button>("RepairButton");
         resetConfigButton = Find<Button>("ResetConfigButton");
         repairReconnectingButton = Find<Button>("RepairReconnectingButton");
@@ -110,7 +113,7 @@ internal sealed partial class MainWindow : Window
         {
             profileBox, urlBox, thirdPartyModelBox, officialModelBox, keyBox, compatibilityCheckBox,
             browseButton, saveProfileButton, deleteProfileButton, thirdPartyButton, officialButton,
-            rollbackButton, repairButton, resetConfigButton, repairReconnectingButton, launchCodexButton, closeCodexButton,
+            rollbackButton, cleanBackupsButton, repairButton, resetConfigButton, repairReconnectingButton, launchCodexButton, closeCodexButton,
             armorButton, restoreArmorButton, historyManagerButton, hotkeyButton, mouseButtonBox, startupCheckBox
         });
 
@@ -176,6 +179,7 @@ internal sealed partial class MainWindow : Window
         thirdPartyButton.Click += async (_, _) => await SwitchThirdPartyAsync();
         officialButton.Click += async (_, _) => await SwitchOfficialAsync();
         rollbackButton.Click += async (_, _) => await RollbackAsync();
+        cleanBackupsButton.Click += async (_, _) => await CleanBackupsAsync();
         repairButton.Click += async (_, _) => await RepairSidebarAsync();
         resetConfigButton.Click += async (_, _) => await ResetConfigAsync();
         repairReconnectingButton.Click += async (_, _) => await RepairReconnectingAsync();
@@ -406,6 +410,17 @@ internal sealed partial class MainWindow : Window
         await DialogWindow.ShowMessageAsync(this, "恢复完成", "已恢复最近一次备份。\n\n请彻底退出并重新打开 Codex。");
     });
 
+    private async Task CleanBackupsAsync()
+    {
+        const string message = "将永久删除当前 Codex 根目录下的 CAS 备份目录：\n\nconfig-switcher-backups\nhistory_sync_backups\n\n不会删除 auth.json、API Key、档案、Skills、对话包或当前配置。清理后将不能再通过“恢复最近备份”恢复这些旧备份。";
+        if (!await DialogWindow.ConfirmAsync(this, "确认清理 CAS 备份", message, "确认删除")) return;
+        await RunActionAsync(cleanBackupsButton, "正在清理 CAS 备份", async service =>
+        {
+            var result = await Task.Run(service.CleanCasBackups);
+            await DialogWindow.ShowMessageAsync(this, "清理完成", result.ToDisplayString());
+        });
+    }
+
     private async Task RepairSidebarAsync()
     {
         if (!await DialogWindow.ConfirmAsync(this, "确认修复会话列表", "此操作会自动识别并备份新旧状态数据库，然后恢复顶层用户会话的可见标记。不会改动会话 JSONL、记忆文件或 auth.json。\n\n请先彻底退出 Codex，再继续。")) return;
@@ -447,8 +462,8 @@ internal sealed partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            SetStatus("打开对话历史管理失败：" + ex.Message, Red, RedSurface);
-            await DialogWindow.ShowMessageAsync(this, "打开失败", ex.Message);
+            SetStatus("打开迁移管理失败：" + ex.Message, Red, RedSurface);
+            await DialogWindow.ShowMessageAsync(this, "打开迁移管理失败", ex.Message);
         }
     }
 
@@ -683,6 +698,7 @@ internal sealed partial class MainWindow : Window
                 await ResetConfigAsync();
             });
 
+            await RunUiSmokeStepAsync(report, "clean-backups-button", CleanBackupsAsync);
             await RunUiSmokeStepAsync(report, "repair-sidebar-button", RepairSidebarAsync);
             await RunUiSmokeStepAsync(report, "history-manager-button", async () =>
             {

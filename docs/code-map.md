@@ -36,11 +36,13 @@
 `outputs/CodexApiSwitcher.exe`
 
 面向用户的 WinForms 单文件程序。支持选择 Codex 根目录、填写 URL/Key/模型、查看当前状态、切换官方/第三方模式、恢复最近备份，以及在模型配置损坏时一键重建官方基础配置。
-当前版本还支持保存多个第三方中转站档案、键盘快捷键/鼠标侧键呼出或隐藏窗口、可选开机启动、关闭到托盘、启动/关闭 Codex 后台进程、GPT-5.5 指令注入式“一键破甲/还原”，以及可选第三方兼容模式。第三方兼容模式默认关闭；只有用户勾选或命令行显式传入 `--compat-mode` 时才会临时降级 Codex 工具能力。
+当前版本还支持保存多个第三方中转站档案、键盘快捷键/鼠标侧键呼出或隐藏窗口、可选开机启动、关闭到托盘、启动/关闭 Codex 后台进程、清理 CAS 备份、GPT-5.5 指令注入式“一键破甲/还原”，以及可选第三方兼容模式。第三方兼容模式默认关闭；只有用户勾选或命令行显式传入 `--compat-mode` 时才会临时降级 Codex 工具能力。
 每次切换都会先确认 Codex 已退出，自动识别并分别备份根目录旧库 `state_5.sqlite` 与新版活动库 `sqlite/state_5.sqlite`，再合并两套数据库的 `threads.rollout_path` 定位 `vscode`/`cli` 顶层用户会话。工具逐文件备份并原子修改 JSONL 第一行的 `payload.model_provider`，随后同步每套数据库的 `model_provider` 与 `has_user_event`。会话正文和后续 JSONL 行保持不变。独立的“修复会话列表”会修复所有已发现状态库的可见标记。
-“一键恢复基础配置”会先备份 `config.toml`，补回顶层 `model_provider`/`model`，移除损坏的 `model_providers.custom` 段，并保留 MCP、插件、沙箱等其他配置；第三方切换时会重新生成 custom provider。
+“一键恢复基础配置”会先备份 `config.toml`，补回顶层 `model_provider`/`model`，移除损坏的 `model_providers.custom` 段，并保留 MCP、插件、沙箱等其他配置；第三方切换时会重新生成 custom provider。“清理 CAS 备份”只删除 `config-switcher-backups` 和 `history_sync_backups`，不触碰当前配置、凭据、档案、Skills 或迁移包。
 
-新增“对话历史管理”窗口后，CAS 可以读取 Codex 历史数据库，按标题/首条消息查询用户可见对话，勾选后导出 `.casconv.zip` 迁移包、导入迁移包或永久删除选中历史。迁移包只包含 JSONL 会话文件和必要索引元数据；导入时会合并保留目标已有历史，并把 `rollout_path` 重写为目标系统路径。删除会移除 `threads`、相关 thread 辅助表记录、`session_index.jsonl` 条目和对应 JSONL 文件，不创建备份，执行前必须确认并要求 Codex 已退出。
+新增“对话历史管理 / 迁移管理”窗口后，CAS 可以读取 Codex 历史数据库，按标题/首条消息查询用户可见对话，勾选后导出 `.casconv.zip` 迁移包、导入迁移包或永久删除选中历史。迁移包只包含 JSONL 会话文件和必要索引元数据；导入时会合并保留目标已有历史，并把 `rollout_path` 重写为目标系统路径。删除会移除 `threads`、相关 thread 辅助表记录、`session_index.jsonl` 条目和对应 JSONL 文件，不创建备份，执行前必须确认并要求 Codex 已退出。
+
+同一迁移窗口还提供同等级的 Skills 管理页，支持按名称/说明/路径查询本机 `skills`，多选后导出 `.casskills.zip`、导入 Skill 包或永久删除用户 Skill。系统内置 `.system` Skills 只读显示，不导出也不删除；导入采用合并策略，目标已存在同名 Skill 时跳过不覆盖。
 
 “一键破甲”会先备份 `config.toml`，写入 `gpt5.5-unrestricted.md`，并设置顶层 `model_instructions_file = "./gpt5.5-unrestricted.md"`；“一键还原”会恢复破甲前的 `model_instructions_file` 行或移除此行，同时删除 CAS 写入的指令文件。
 当 Codex 更新导致数据库中的 JSONL 路径失效时，工具会跳过缺失路径、保留切换结果，并在界面/命令行提示“可能是 Codex 更新导致路径变化”。
