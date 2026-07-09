@@ -6,11 +6,11 @@ Codex API Switcher（CAS）用来在 Codex 的官方 OpenAI 登录和第三方 O
 
 请到 GitHub Releases 下载对应系统版本：
 
-- macOS Apple Silicon / M 系列：[CodexApiSwitcher-macos-arm64.dmg](https://github.com/jiali9974-ai/CodexApiSwitcher/releases/download/v2.2.0/CodexApiSwitcher-macos-arm64.dmg)
-- macOS Intel：[CodexApiSwitcher-macos-x64.dmg](https://github.com/jiali9974-ai/CodexApiSwitcher/releases/download/v2.2.0/CodexApiSwitcher-macos-x64.dmg)
-- Release 页面：[v2.2.0](https://github.com/jiali9974-ai/CodexApiSwitcher/releases/tag/v2.2.0)
+- macOS Apple Silicon / M 系列：[CodexApiSwitcher-macos-arm64.dmg](https://github.com/jiali9974-ai/CodexApiSwitcher/releases/latest/download/CodexApiSwitcher-macos-arm64.dmg)
+- macOS Intel：[CodexApiSwitcher-macos-x64.dmg](https://github.com/jiali9974-ai/CodexApiSwitcher/releases/latest/download/CodexApiSwitcher-macos-x64.dmg)
+- Release 页面：[最新版本](https://github.com/jiali9974-ai/CodexApiSwitcher/releases/latest)
 
-- Windows：[CodexApiSwitcher-win-x64.exe](https://github.com/jiali9974-ai/CodexApiSwitcher/releases/download/v2.2.0/CodexApiSwitcher-win-x64.exe)
+- Windows：[CodexApiSwitcher-win-x64.exe](https://github.com/jiali9974-ai/CodexApiSwitcher/releases/latest/download/CodexApiSwitcher-win-x64.exe)
 
 Linux 版本可以从源码构建，或使用本地构建产物发布到 Releases。
 
@@ -48,7 +48,7 @@ xattr -dr com.apple.quarantine "/Applications/Codex API Switcher.app"
 
 ## Windows 怎么打开
 
-1. 从 Release 下载 [CodexApiSwitcher-win-x64.exe](https://github.com/jiali9974-ai/CodexApiSwitcher/releases/download/v2.2.0/CodexApiSwitcher-win-x64.exe)。
+1. 从 Release 下载 [CodexApiSwitcher-win-x64.exe](https://github.com/jiali9974-ai/CodexApiSwitcher/releases/latest/download/CodexApiSwitcher-win-x64.exe)。
 2. 双击 `CodexApiSwitcher-win-x64.exe`，可以直接从“下载”或“桌面”运行。
 3. 如果 Windows SmartScreen 或安全软件提示，请确认文件来源是本仓库 Release，再选择“更多信息”→“仍要运行”。
 4. 打开后选择包含 `config.toml` 的 Codex 根目录。
